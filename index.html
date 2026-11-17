@@ -337,6 +337,7 @@ tr.locked b{color:var(--mute)}
 .nomi-form input:focus{outline:none;border-color:#e04f73}
 .nomi-foot{font-size:11px;color:#7a6464;padding:0 14px 10px;text-align:center}
 @media (max-width:620px){#nomi{right:10px;bottom:10px}.nomi-fab span{display:none}.nomi-fab{padding:6px}}
+.nomi-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
 /* modal */
 .modal{position:fixed;inset:0;background:rgba(22,36,30,.4);z-index:50;display:grid;place-items:center;padding:20px}
 .modal .in{background:var(--paper);border-radius:18px;max-width:640px;width:100%;max-height:86vh;overflow:auto;padding:22px}
@@ -885,11 +886,107 @@ function render() {
 }
 const LOGO = "data:image/webp;base64,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";
 const logoImg = h => `<img src="${LOGO}" alt="No Me Olvides" style="height:${h}px;width:auto;display:block;margin:0 auto">`;
-/* ---------- Nomi, asistente de la landing ---------- */
+/* ---------- Nomi, asistente de la landing (respuestas preparadas, sin IA) ---------- */
 const NOMI = {open: false, busy: false, msgs: [], views: ["presentacion", "ingresar", "registro"]};
-const NOMI_SUG = ["¿Qué es No Me Olvides?", "¿Cuánto cuesta para un psicólogo?", "¿Cómo se suman mis pacientes?", "¿Qué pasa con los datos?"];
+const NOMI_A = {
+  crear: ["Crear cuenta gratis", "nomiGo('registro')"],
+  planes: ["Ver planes", "nomiScroll('.lp-plans')"],
+  biblio: ["Ver biblioteca", "nomiScroll('.lp-libsec')"],
+  ingresar: ["Ingresar", "nomiGo('ingresar')"]
+};
+const NOMI_KB = [
+  {id: "crisis", k: ["suicid", "matarme", "quitarme la vida", "no quiero vivir", "morirme", "quiero morir", "hacerme dano", "autolesion", "cortarme", "crisis", "emergencia", "en peligro", "no aguanto mas"],
+   a: "Lamento mucho que estés pasando por esto. Si sientes que estás en peligro, llama ahora a la **línea \*4141** (prevención del suicidio, gratuita y disponible 24/7 desde celulares) o al **131** (SAMU) si es una emergencia. También te puede ayudar hablar en este momento con alguien de confianza. No estás solo/a.",
+   s: []},
+  {id: "nomi", k: ["quien eres", "eres un bot", "eres una ia", "eres real", "inteligencia artificial", "como te llamas", "nomi"],
+   a: "Soy **Nomi**, la mariposa asistente de No Me Olvides. Respondo dudas sobre la plataforma con información preparada por el equipo, así que no invento nada. Si algo no lo sé, te lo digo.",
+   s: ["¿Qué es No Me Olvides?", "¿Cuánto cuesta?"]},
+  {id: "saludo", k: ["hola", "buenas", "buenos dias", "buenas tardes", "buenas noches", "hey", "holi"], weak: true,
+   a: "¡Hola! Cuéntame qué te gustaría saber de No Me Olvides: cómo funciona, los planes, cómo sumar a tus pacientes o qué pasa con los datos.",
+   s: ["¿Qué es No Me Olvides?", "¿Cuánto cuesta?", "¿Cómo se suman mis pacientes?"]},
+  {id: "gracias", k: ["gracias", "muchas gracias", "genial", "perfecto", "buenisimo", "excelente", "vale", "ok"], weak: true,
+   a: "¡De nada! Si te quedó alguna duda, pregúntame cuando quieras. Y si quieres probarla, crear la cuenta es gratis.",
+   s: ["¿Cómo empiezo?"], act: ["crear"]},
+  {id: "que", k: ["que es", "de que se trata", "que hace", "para que sirve", "en que consiste", "no me olvides", "nmo", "explicame", "cuentame"],
+   a: "**No Me Olvides** es una plataforma de bienestar creativo que psicólogos, clínicas y centros de salud ofrecen a sus pacientes para acompañarlos entre sesiones. El paciente registra cada día cómo está con su “flor” y hace actividades creativas cortas. El profesional, con permiso del paciente, llega a la sesión con contexto en vez de partir desde cero.",
+   s: ["¿Cómo funciona?", "¿Qué actividades hay?", "¿Cuánto cuesta?"]},
+  {id: "como", k: ["como funciona", "como se usa", "como empiezo", "como empezar", "pasos", "como parto", "funcionamiento", "como lo uso"],
+   a: "Funciona en tres pasos. **1)** El profesional crea su cuenta gratis y recibe un código de invitación. **2)** Comparte ese código con sus pacientes, por ejemplo por WhatsApp, y ellos crean su cuenta vinculada. **3)** El paciente registra su flor y hace actividades cuando quiere; el profesional ve las tendencias que el paciente decide compartir.",
+   s: ["¿Cuánto cuesta?", "¿Qué ve el profesional?"], act: ["crear"]},
+  {id: "precio", k: ["precio", "cuesta", "cuanto", "valor", "planes", "pagar", "pago", "suscripcion", "tarifa", "cobran", "mensualidad", "costo"],
+   a: "Hay tres planes (precios referenciales, en validación): **Gratis**, para hasta 3 pacientes; **Pro**, $19.990 al mes, hasta 25 pacientes con la biblioteca completa y prueba de 14 días; y **Centro**, $14.990 por profesional al mes, con pacientes ilimitados, panel del equipo y reportes anónimos. Para el paciente siempre es gratis.",
+   s: ["¿Qué incluye el plan gratis?", "¿Qué incluye el plan Centro?"], act: ["planes"]},
+  {id: "gratis", k: ["gratis", "gratuito", "free", "sin pagar", "plan gratis", "version gratis"],
+   a: "El plan **Gratis** permite trabajar con hasta 3 pacientes, con 4 actividades básicas e historial de 7 días. El botón de ayuda en crisis está incluido en todos los planes. Es ideal para probar la plataforma antes de pasar a Pro.",
+   s: ["¿Qué incluye el plan Pro?"], act: ["crear"]},
+  {id: "pro", k: ["plan pro", "pro", "profesional independiente", "prueba de 14", "14 dias"],
+   a: "El plan **Pro** cuesta $19.990 al mes (referencial) y tiene prueba de 14 días. Incluye hasta 25 pacientes, la biblioteca completa de actividades, señales para preparar la próxima sesión, notas privadas e historial completo.",
+   s: ["¿Qué incluye el plan Centro?"], act: ["planes"]},
+  {id: "centro", k: ["plan centro", "clinica", "clinicas", "centro de salud", "institucion", "equipo de", "varios profesionales", "empresa", "cesfam", "hospital"],
+   a: "Para clínicas y centros está el plan **Centro**: $14.990 por profesional al mes (referencial), con pacientes ilimitados, un panel para todo el equipo, reportes anónimos de uso y un taller presencial trimestral. Para conversarlo, usa el botón “Quiero una demo” en la sección de planes.",
+   s: ["¿Qué pasa con los datos?", "¿Cómo se suman los pacientes?"], act: ["planes"]},
+  {id: "pacientes", k: ["invit", "sumar", "suman", "agregar paciente", "mis pacientes", "codigo", "vincular", "vinculo", "como entra el paciente", "como se une"],
+   a: "Al crear tu cuenta de profesional recibes un **código de invitación**. Se lo compartes a tu paciente (por ejemplo por WhatsApp) y él crea su cuenta con ese código; así queda vinculado a ti. Para el paciente es gratis.",
+   s: ["¿Qué ve el profesional?", "¿El paciente paga?"], act: ["crear"]},
+  {id: "pacpaga", k: ["paciente paga", "pagan los pacientes", "le cobra al paciente", "cuesta para el paciente", "soy paciente"],
+   a: "Para el paciente No Me Olvides es **gratis**. Lo ofrece su psicólogo/a o su centro de salud. Si eres paciente, pídele el código de invitación a tu profesional para crear tu cuenta.",
+   s: ["¿Qué actividades hay?", "¿Qué pasa con mis datos?"], act: ["crear"]},
+  {id: "sinpsico", k: ["no tengo psicologo", "no tengo terapeuta", "sin psicologo", "sin codigo", "no tengo codigo"],
+   a: "No Me Olvides está pensada como complemento de un proceso con un profesional, por eso el paciente entra con el código de su psicólogo/a o centro. Si hoy no tienes uno, puedes pedir orientación en tu CESFAM o centro de salud más cercano.",
+   s: ["¿Qué es No Me Olvides?"]},
+  {id: "datos", k: ["datos", "privacidad", "privado", "seguro", "seguridad", "confidencial", "comparte", "compartir", "quien ve", "venden", "informacion personal", "mi diario"],
+   a: "La privacidad es central. El **diario personal del paciente es privado** salvo que él decida compartirlo, y el profesional solo ve lo que el paciente autoriza. Las notas de sesión del profesional también son privadas. No vendemos datos ni los usamos para publicidad.",
+   s: ["¿Qué ve el profesional?", "¿Es una terapia?"]},
+  {id: "ve", k: ["que ve el profesional", "que ve el psicologo", "seguimiento", "panel", "monitorear", "ver a mis pacientes", "reportes", "estadisticas", "tendencias"],
+   a: "Con permiso del paciente, el profesional ve la **tendencia de ánimo** (la flor de cada día), las actividades hechas y las reflexiones que el paciente decide compartir. Puede asignar actividades y tomar notas privadas, así la sesión parte con contexto.",
+   s: ["¿Qué actividades hay?", "¿Cuánto cuesta?"]},
+  {id: "flor", k: ["flor", "animo", "registro emocional", "como me siento", "emociones", "estado de animo"],
+   a: "La **flor** es el registro emocional diario: el paciente elige cómo está y su flor cambia de color y forma. Toma segundos y, con el tiempo, muestra tendencias que el paciente y su profesional pueden conversar en sesión.",
+   s: ["¿Qué actividades hay?"]},
+  {id: "act", k: ["actividad", "actividades", "biblioteca", "ejercicios", "tareas", "escritura", "arte", "musica", "lectura", "collage", "dibujo", "creativ"],
+   a: "La biblioteca tiene **actividades creativas de 5 a 25 minutos** en cinco tipos: escritura, arte, lectura, música y cuerpo. Están pensadas para trabajar ansiedad, estrés, autoestima, duelo, soledad o regulación emocional, sin necesidad de saber dibujar ni escribir bonito.",
+   s: ["¿Qué ve el profesional?", "¿Cuánto cuesta?"], act: ["biblio"]},
+  {id: "sirve", k: ["ansiedad", "depresion", "estres", "duelo", "me sirve", "me ayuda", "me sirve para", "sirve para", "autoestima", "soledad", "angustia", "pena"],
+   a: "Las actividades de la biblioteca están pensadas para acompañar temas como **ansiedad, estrés, duelo, autoestima o soledad**, siempre como complemento del trabajo con tu psicólogo/a. Lo ideal es que tu profesional te sugiera cuáles hacer según tu proceso.",
+   s: ["¿Qué actividades hay?", "¿Es una terapia?"], act: ["biblio"]},
+  {id: "terapia", k: ["terapia", "reemplaza", "reemplazar", "sustituye", "tratamiento", "diagnostico", "medicamento"],
+   a: "No. No Me Olvides **no es una terapia ni reemplaza la atención profesional**. Es un complemento para acompañar el proceso entre sesiones, siempre de la mano de un psicólogo/a o centro de salud.",
+   s: ["¿Cómo funciona?"]},
+  {id: "cuenta", k: ["crear cuenta", "registrarme", "registro", "inscribirme", "google", "contrasena", "clave", "ingresar", "iniciar sesion", "login", "olvide"],
+   a: "Puedes crear tu cuenta en un minuto con tu correo o con Google. Los profesionales eligen su región, comuna y centro de salud desde el registro oficial del Minsal. Si olvidaste tu contraseña, en la pantalla de ingreso puedes pedir un correo para cambiarla.",
+   s: ["¿Cómo se suman mis pacientes?"], act: ["crear", "ingresar"]},
+  {id: "demo", k: ["demo", "contacto", "contactar", "hablar con alguien", "ventas", "correo", "telefono", "whatsapp", "reunion", "cotizar", "cotizacion"],
+   a: "Para conversar sobre una implementación en tu centro, usa el botón **“Quiero una demo”** en la sección de planes. Si eres profesional independiente, lo más rápido es crear tu cuenta gratis y probarla.",
+   s: ["¿Qué incluye el plan Centro?"], act: ["planes"]},
+  {id: "quienes", k: ["quienes son", "quien lo hizo", "equipo", "uvm", "universidad", "estudiantes", "proyecto", "beta", "de donde son"],
+   a: "No Me Olvides nace como proyecto del ramo **Creación de Empresas**, de Ingeniería Comercial en la Universidad Viña del Mar. Lo que ves es una beta: funciona con cuentas reales y la estamos validando con profesionales.",
+   s: ["¿Qué es No Me Olvides?"]},
+  {id: "donde", k: ["region", "regiones", "ciudad", "donde", "chile", "disponible", "santiago", "valparaiso", "vina", "extranjero", "otro pais"],
+   a: "Es una plataforma web, así que funciona desde cualquier lugar con internet. Está pensada para Chile: al registrarte eliges tu región, comuna y centro de salud.",
+   s: ["¿Cómo funciona?"], act: ["crear"]},
+  {id: "app", k: ["app", "aplicacion", "celular", "android", "iphone", "descargar", "movil"],
+   a: "Por ahora es una **web** que funciona bien en el celular, sin descargar nada: basta con abrir la página e ingresar. Más adelante podría tener app propia.",
+   s: ["¿Cómo funciona?"]}
+];
+const NOMI_SUG = ["¿Qué es No Me Olvides?", "¿Cuánto cuesta?", "¿Cómo se suman mis pacientes?", "¿Qué pasa con los datos?"];
+const NOMI_HELLO = {role: "assistant", content: "Hola, soy **Nomi**. Te cuento cómo funciona No Me Olvides, los planes o cómo sumar a tus pacientes. ¿Qué te gustaría saber?", s: NOMI_SUG};
+const nomiNorm = t => " " + t.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9*]+/g, " ").trim() + " ";
+function nomiAnswer(q) {
+  const t = nomiNorm(q);
+  let best = null, score = 0;
+  for (const it of NOMI_KB) {
+    let sc = 0;
+    for (const k of it.k) { const kk = nomiNorm(k).trim(); if (kk && t.includes(kk.length < 5 ? " " + kk + " " : kk)) sc += kk.split(" ").length + (it.id === "crisis" ? 100 : 0); }
+    if (it.weak && sc) sc = 0.5;
+    if (sc > score) { score = sc; best = it; }
+  }
+  if (best) return {role: "assistant", content: best.a, s: best.s || [], act: best.act || []};
+  return {role: "assistant", content: "Esa no la tengo clara todavía. Puedo contarte cómo funciona No Me Olvides, los planes, la privacidad o cómo sumar pacientes. Si es algo más específico, crea tu cuenta gratis o pide una demo desde la sección de planes.", s: NOMI_SUG.slice(0, 3), act: ["planes"]};
+}
 const nomiAvatar = (s = 34) => `<img class="nomi-av" src="${(document.querySelector('link[rel="icon"]') || {}).href || ""}" alt="" width="${s}" height="${s}">`;
-const nomiFmt = t => esc(t).replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
+const nomiFmt = t => esc(t).replace(/\\\*/g, "*").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
+function nomiGo(v) { NOMI.open = false; nomiDraw(); go(v); }
+function nomiScroll(sel) { NOMI.open = false; nomiDraw(); if (S.view !== "presentacion") go("presentacion"); setTimeout(() => { const el = document.querySelector(sel); if (el) el.scrollIntoView({behavior: "smooth", block: "start"}); }, 60); }
 function nomiSync() {
   let root = document.getElementById("nomi");
   if (!root) { root = document.createElement("div"); root.id = "nomi"; document.body.appendChild(root); nomiDraw(); }
@@ -898,42 +995,33 @@ function nomiSync() {
 function nomiDraw() {
   const root = document.getElementById("nomi"); if (!root) return;
   if (!NOMI.open) { root.innerHTML = `<button class="nomi-fab" onclick="nomiToggle()" aria-label="Conversar con Nomi">${nomiAvatar(40)}<span>¿Dudas? Pregúntale a <b>Nomi</b></span></button>`; return; }
-  const list = NOMI.msgs.map(m => `<div class="nomi-msg ${m.role === "user" ? "me" : "bot"}">${nomiFmt(m.content)}</div>`).join("");
+  const all = [NOMI_HELLO, ...NOMI.msgs], last = all[all.length - 1];
+  const list = all.map(m => `<div class="nomi-msg ${m.role === "user" ? "me" : "bot"}">${nomiFmt(m.content)}</div>`).join("");
+  const extras = !NOMI.busy && last.role === "assistant" ? `
+    ${(last.act || []).length ? `<div class="nomi-acts">${last.act.map(a => `<button class="lp-btn sm" onclick="${NOMI_A[a][1]}">${NOMI_A[a][0]}</button>`).join("")}</div>` : ""}
+    ${(last.s || []).length ? `<div class="nomi-sug">${last.s.map(q => `<button onclick="nomiSend(this.textContent)">${esc(q)}</button>`).join("")}</div>` : ""}` : "";
   root.innerHTML = `<div class="nomi-panel" role="dialog" aria-label="Chat con Nomi">
     <div class="nomi-head">${nomiAvatar(38)}<div><b>Nomi</b><small>Asistente de No Me Olvides</small></div><button class="nomi-x" onclick="nomiToggle()" aria-label="Cerrar">✕</button></div>
-    <div class="nomi-body" id="nomi-body">
-      <div class="nomi-msg bot">Hola, soy <b>Nomi</b>. Te cuento cómo funciona No Me Olvides, los planes o cómo sumar a tus pacientes. ¿Qué te gustaría saber?</div>
-      ${list}
-      ${NOMI.busy ? `<div class="nomi-msg bot nomi-typing"><i></i><i></i><i></i></div>` : ""}
-      ${!NOMI.msgs.length ? `<div class="nomi-sug">${NOMI_SUG.map((q, i) => `<button onclick="nomiSend(NOMI_SUG[${i}])">${esc(q)}</button>`).join("")}</div>` : ""}
+    <div class="nomi-body" id="nomi-body">${list}
+      ${NOMI.busy ? `<div class="nomi-msg bot nomi-typing"><i></i><i></i><i></i></div>` : ""}${extras}
     </div>
     <form class="nomi-form" onsubmit="event.preventDefault();nomiSend()">
-      <input id="nomi-in" maxlength="600" placeholder="Escribe tu pregunta…" autocomplete="off" ${NOMI.busy ? "disabled" : ""}>
+      <input id="nomi-in" maxlength="300" placeholder="Escribe tu pregunta…" autocomplete="off" ${NOMI.busy ? "disabled" : ""}>
       <button class="lp-btn sm" ${NOMI.busy ? "disabled" : ""}>Enviar</button>
     </form>
-    <div class="nomi-foot">Nomi es una IA y puede equivocarse. No reemplaza la atención profesional. En crisis: <b>*4141</b> o <b>131</b>.</div>
+    <div class="nomi-foot">Nomi responde con información preparada por el equipo. No reemplaza la atención profesional. En crisis: <b>*4141</b> o <b>131</b>.</div>
   </div>`;
   const b = document.getElementById("nomi-body"); if (b) b.scrollTop = b.scrollHeight;
-  const i = document.getElementById("nomi-in"); if (i && !NOMI.busy) i.focus();
+  const i = document.getElementById("nomi-in"); if (i && !NOMI.busy && window.innerWidth > 620) i.focus();
 }
 function nomiToggle() { NOMI.open = !NOMI.open; nomiDraw(); }
-async function nomiSend(text) {
+function nomiSend(text) {
   const inp = document.getElementById("nomi-in");
   const t = (text ?? (inp ? inp.value : "")).trim();
   if (!t || NOMI.busy) return;
-  NOMI.msgs.push({role: "user", content: t.slice(0, 600)});
+  NOMI.msgs.push({role: "user", content: t.slice(0, 300)});
   NOMI.busy = true; nomiDraw();
-  let reply;
-  try {
-    const r = await fetch("/api/chat", {method: "POST", headers: {"content-type": "application/json"}, body: JSON.stringify({messages: NOMI.msgs.slice(-12)})});
-    const d = await r.json().catch(() => ({}));
-    if (r.ok && d.reply) reply = d.reply;
-    else if (d.error === "rate_limited") reply = "Me hiciste muchas preguntas seguidas. Dame un rato y seguimos conversando.";
-    else if (d.error === "not_configured") reply = "Todavía me están terminando de instalar, así que aún no puedo responder. Mientras tanto, puedes crear tu cuenta gratis y conocer la plataforma.";
-    else reply = "Tuve un problema para responder. ¿Lo intentas de nuevo en un momento?";
-  } catch (e) { reply = "No pude conectarme. Revisa tu conexión e inténtalo otra vez."; }
-  NOMI.msgs.push({role: "assistant", content: reply});
-  NOMI.busy = false; nomiDraw();
+  setTimeout(() => { NOMI.msgs.push(nomiAnswer(t)); NOMI.busy = false; nomiDraw(); }, 450 + Math.min(700, t.length * 12));
 }
 function go(view) { S.view = view; render(); window.scrollTo(0, 0); }
 
