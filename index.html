@@ -477,7 +477,7 @@ async function uniqueCode(name) {
 async function createProfile(uid, d) {
   if (d.role === "pro") {
     const code = await uniqueCode(d.name);
-    await F.setDoc(F.doc(db, "pros", uid), {name: (d.prof ? d.prof + " " : "") + d.name, place: (d.prof ? "Consulta particular" : "Centro de salud") + (d.comuna ? " · " + d.comuna : ""), region: d.region || "", comuna: d.comuna || "", code, plan: "gratis", createdDay: TODAYN});
+    await F.setDoc(F.doc(db, "pros", uid), {name: (d.prof ? d.prof + " " : "") + d.name, place: (d.centro || (d.prof ? "Consulta particular" : "Centro de salud")) + (d.comuna && d.centro !== "Atención online" ? " · " + d.comuna : ""), region: d.region || "", comuna: d.comuna || "", centro: d.centro || "", code, plan: "gratis", createdDay: TODAYN});
     await F.setDoc(F.doc(db, "codes", code), {proId: uid});
     const profile = {role: "pro", name: d.name, email: d.email};
     await F.setDoc(F.doc(db, "users", uid), profile);
@@ -568,12 +568,29 @@ function onRegion(prefix) {
   const i = $(`#${prefix}-region`).value, sel = $(`#${prefix}-comuna`);
   sel.innerHTML = i === "" ? `<option value="">Primero elige una región</option>` : `<option value="">Selecciona tu comuna</option>` + REGIONES[i][1].map(c => `<option>${esc(c)}</option>`).join("");
   sel.disabled = i === "";
+  onComuna(prefix);
 }
+let CENTROS = null;
+async function loadCentros() { if (CENTROS) return CENTROS; try { CENTROS = await fetch("centros.json").then(r => r.json()); } catch (e) { CENTROS = {}; } return CENTROS; }
+async function onComuna(prefix) {
+  const com = $(`#${prefix}-comuna`).value, sel = $(`#${prefix}-centro`);
+  if (!com) { sel.innerHTML = `<option value="">Primero elige una comuna</option>`; sel.disabled = true; toggleOtro(prefix); return; }
+  sel.innerHTML = `<option value="">Cargando centros…</option>`; sel.disabled = true;
+  const c = (await loadCentros())[com] || [];
+  if ($(`#${prefix}-comuna`).value !== com) return;
+  sel.innerHTML = `<option value="">Selecciona dónde atiendes</option><option value="__particular">Consulta particular</option><option value="__online">Solo atención online</option>` +
+    (c.length ? `<optgroup label="Centros de salud en ${esc(com)}">${c.map(n => `<option>${esc(n)}</option>`).join("")}</optgroup>` : "") + `<option value="__otro">Otro (escribir nombre)</option>`;
+  sel.disabled = false; toggleOtro(prefix);
+}
+function toggleOtro(prefix) { const v = $(`#${prefix}-centro`).value, w = $(`#${prefix}-otro-wrap`); w.classList.toggle("hidden", v !== "__otro"); $(`#${prefix}-otro`).required = v === "__otro"; }
 function roleFields(r, prefix) {
   return r.role === "pro" ? `
         <label>Profesión</label><select class="field" id="${prefix}-prof"><option value="Ps.">Psicólogo/a</option><option value="Dr/a.">Psiquiatra</option><option value="T.O.">Terapeuta ocupacional</option><option value="">Clínica o centro de salud</option></select>
         <label>Región</label><select class="field" id="${prefix}-region" required onchange="onRegion('${prefix}')">${regionOpts()}</select>
-        <label>Comuna</label><select class="field" id="${prefix}-comuna" required disabled><option value="">Primero elige una región</option></select>` : `
+        <label>Comuna</label><select class="field" id="${prefix}-comuna" required disabled onchange="onComuna('${prefix}')"><option value="">Primero elige una región</option></select>
+        <label>Lugar de atención</label><select class="field" id="${prefix}-centro" required disabled onchange="toggleOtro('${prefix}')"><option value="">Primero elige una comuna</option></select>
+        <div id="${prefix}-otro-wrap" class="hidden"><label>Nombre del centro</label><input class="field" id="${prefix}-otro" placeholder="Ej: Centro Psicológico Los Aromos" autocomplete="off"></div>
+        <div class="tiny muted" style="margin:-6px 0 10px">Centros de salud vigentes según el registro oficial del Minsal (DEIS).</div>` : `
         <label>Código de tu profesional</label><input class="field" id="${prefix}-code" required placeholder="Ej: NMO-CF24" style="text-transform:uppercase" autocomplete="off">
         <div class="tiny muted" style="margin:-6px 0 10px">Te lo entrega tu psicólogo/a o tu centro de salud.</div>`;
 }
@@ -618,7 +635,7 @@ function vPerfil() {
 }
 async function collectRole(prefix, errEl) {
   const d = {role: S.reg.role, name: $(`#${prefix}-name`).value.trim()};
-  if (d.role === "pro") { d.prof = $(`#${prefix}-prof`).value; const ri = $(`#${prefix}-region`).value; d.region = ri === "" ? "" : REGIONES[ri][0]; d.comuna = $(`#${prefix}-comuna`).value; }
+  if (d.role === "pro") { d.prof = $(`#${prefix}-prof`).value; const ri = $(`#${prefix}-region`).value; d.region = ri === "" ? "" : REGIONES[ri][0]; d.comuna = $(`#${prefix}-comuna`).value; const cv = $(`#${prefix}-centro`).value; d.centro = cv === "__particular" ? "Consulta particular" : cv === "__online" ? "Atención online" : cv === "__otro" ? $(`#${prefix}-otro`).value.trim() : cv; }
   else {
     const code = $(`#${prefix}-code`).value.trim().toUpperCase();
     const found = await findCode(code);
