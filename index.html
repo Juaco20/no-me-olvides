@@ -25,7 +25,7 @@ input,textarea,select{font:inherit;color:inherit}
 .top-in{max-width:1240px;margin:0 auto;display:flex;align-items:center;gap:16px;padding:10px 20px;flex-wrap:wrap}
 .brand{display:flex;align-items:center;gap:10px;font-family:Fraunces,serif;font-weight:600;font-size:19px}
 .brand small{font-family:"DM Sans";font-weight:500;font-size:11px;background:var(--green);color:#fff;border-radius:99px;padding:2px 8px;letter-spacing:.04em}
-.tabs{display:flex;gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:4px;margin-left:auto}
+.tabs{display:flex;gap:4px;background:var(--paper);border:1px solid var(--line);border-radius:99px;padding:4px}
 .tabs button{border:0;background:none;padding:7px 14px;border-radius:99px;color:var(--mute);font-weight:500}
 .tabs button.on{background:var(--green);color:#fff}
 .reset{border:1px solid var(--line);background:none;border-radius:99px;padding:7px 12px;color:var(--mute);font-size:13px}
@@ -185,6 +185,24 @@ tr.locked b{color:var(--mute)}
 .cmp td:not(:first-child),.cmp th:not(:first-child){text-align:center}
 .field{display:block;width:100%;border:1px solid var(--line);border-radius:10px;padding:9px 10px;background:#fff;margin:4px 0 10px}
 @media (max-width:700px){.plans{grid-template-columns:1fr}}
+.navwrap{margin-left:auto;display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.user{display:flex;gap:8px;align-items:center}
+.uname{font-size:13px;font-weight:600;line-height:1.15}
+.uname small{display:block;font-weight:400;color:var(--mute);font-size:11.5px}
+.auth{display:flex;gap:20px;justify-content:center;align-items:flex-start;flex-wrap:wrap;padding:20px 0 40px}
+.auth-card{padding:28px;width:100%;max-width:420px}
+.auth label{display:block;font-size:12.5px;color:var(--mute)}
+.demo-card{padding:22px;width:100%;max-width:380px}
+.gbtn{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px;font-weight:600;margin-top:18px}
+.gbtn:hover{background:var(--cream)}
+.gdot{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--sage);display:grid;place-items:center;font-size:12px;color:var(--ink)}
+.or{display:flex;align-items:center;gap:10px;color:var(--mute);font-size:12px;margin:16px 0 10px}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.err{color:var(--danger);font-size:13px;min-height:18px;margin:-4px 0 8px}
+.acct{display:flex;gap:10px;align-items:center;width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 12px;margin-top:8px}
+.acct:hover{border-color:var(--sage);background:#fbf8f1}
+.acct code{font-size:12px;background:var(--cream);padding:2px 6px;border-radius:6px}
+.demo-warn{margin-top:14px;padding:10px 12px;border-radius:10px;background:var(--rose2);color:#6b3a2a;font-size:12.5px}
 /* modal */
 .modal{position:fixed;inset:0;background:rgba(22,36,30,.4);z-index:50;display:grid;place-items:center;padding:20px}
 .modal .in{background:var(--paper);border-radius:18px;max-width:640px;width:100%;max-height:86vh;overflow:auto;padding:22px}
@@ -214,12 +232,7 @@ tr.locked b{color:var(--mute)}
 <header class="top">
   <div class="top-in">
     <div class="brand"><span id="logo"></span>No Me Olvides <small>BETA</small></div>
-    <div class="tabs" role="tablist">
-      <button data-view="presentacion">Presentación</button>
-      <button data-view="panel">Panel profesional</button>
-      <button data-view="app">App del paciente</button>
-    </div>
-    <button class="reset" id="reset" title="Vuelve los datos de ejemplo a su estado inicial">Reiniciar demo</button>
+    <div id="nav" class="navwrap"></div>
   </div>
 </header>
 
@@ -230,7 +243,7 @@ tr.locked b{color:var(--mute)}
 /* ================= utilidades ================= */
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const TODAY = new Date(2026, 10, 16);
+const TODAY = (() => { const d = new Date(); d.setHours(0, 0, 0, 0); return d; })();
 const DIAS = ["dom","lun","mar","mié","jue","vie","sáb"];
 const MESES = ["ene","feb","mar","abr","may","jun","jul","ago","sep","oct","nov","dic"];
 const dayLabel = off => { const d = new Date(TODAY); d.setDate(d.getDate() - off); return `${DIAS[d.getDay()]} ${d.getDate()}`; };
@@ -306,14 +319,175 @@ function seed() {
   };
 }
 
-const KEY = "nmo-beta-v2";
-let S;
-try { const raw = localStorage.getItem(KEY); S = raw ? JSON.parse(raw) : seed(); } catch (e) { S = seed(); }
-function save() { try { const copy = JSON.parse(JSON.stringify(S)); copy.app.actImg = null; copy.patients.forEach(p => p.done.forEach(d => { if (d.img) d.img = null; })); localStorage.setItem(KEY, JSON.stringify(copy)); } catch (e) {} }
+/* ================= cuentas (demo, sin seguridad real) ================= */
+const KEY = "nmo-db-v1";
+const COLORS = ["#5b7fc7","#c46a4f","#2f5d4b","#8a6bb5","#a5802a","#3f7461"];
+const dayNum = d => Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / 864e5);
+const initials = n => String(n || "?").replace(/^(Ps\.|Dr\/a\.|T\.O\.)\s*/, "").split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0].toUpperCase()).join("");
+const firstName = n => String(n || "").replace(/^(Ps\.|Dr\/a\.|T\.O\.)\s*/, "").split(/\s+/)[0];
+const shortName = n => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[1][0].toUpperCase()}.` : p[0]; };
+const DIAS_L = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const MESES_L = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+const longDate = () => `${DIAS_L[TODAY.getDay()]} ${TODAY.getDate()} de ${MESES_L[TODAY.getMonth()]}`;
+const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+function defaultApp() {
+  return {onboarded:false, step:1, consent:{checkins:true, actividades:true, reflexiones:false}, answers:[], profile:null, tab:"hoy", open:null, mood:null, emos:[], moodNote:"", checkedToday:false, sheet:null, journal:[], draft:"", draftShared:false, actText:"", actShared:true, actImg:null, joined:[]};
+}
+function seedDB() {
+  const s = seed();
+  s.pro.id = "pro-cf";
+  s.patients.forEach(p => { p.app = defaultApp(); });
+  const mart = s.patients.find(p => p.id === "p1");
+  mart.app = {...s.app, onboarded:true, step:3, profile:"Arte", answers:["Arte","mid","Ansiedad"]};
+  return {
+    v: 1, day: dayNum(TODAY), session: null,
+    users: [
+      {email:"camila@nomeolvides.demo", pass:"demo1234", role:"pro", proId:"pro-cf", name:"Camila Fuentes"},
+      {email:"martina@nomeolvides.demo", pass:"demo1234", role:"pac", proId:"pro-cf", patientId:"p1", name:"Martina Rojas"}
+    ],
+    pros: {"pro-cf": {pro: s.pro, patients: s.patients}}
+  };
+}
+let DB;
+try { const raw = localStorage.getItem(KEY); DB = raw ? JSON.parse(raw) : seedDB(); } catch (e) { DB = seedDB(); }
+(function shiftDays() {
+  const diff = dayNum(TODAY) - (DB.day || dayNum(TODAY));
+  if (diff <= 0) return;
+  Object.values(DB.pros).forEach(W => W.patients.forEach(p => {
+    p.mood = diff >= 14 ? Array(14).fill(null) : p.mood.slice(diff).concat(Array(diff).fill(null));
+    p.lastActive += diff;
+    p.done.forEach(d => d.date += diff); p.assigned.forEach(a => a.date += diff);
+    if (p.app) { p.app.checkedToday = false; p.app.mood = null; p.app.emos = []; p.app.moodNote = ""; (p.app.journal || []).forEach(j => j.date += diff); }
+  }));
+  DB.day = dayNum(TODAY);
+})();
+const S = {view:"presentacion", proTab:"resumen", proPatient:null, libFilter:"Todos", pro:null, patients:[], me:null, app:null, reg:null};
+function save() { try { if (S.app) S.app.actImg = null; localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) {} }
+const currentUser = () => DB.session ? DB.users.find(u => u.email === DB.session.email) || null : null;
+function applySession() {
+  const u = currentUser();
+  if (!u || !DB.pros[u.proId]) { DB.session = null; S.pro = null; S.patients = []; S.me = null; S.app = null; return; }
+  const W = DB.pros[u.proId]; S.pro = W.pro; S.patients = W.patients;
+  if (u.role === "pac") { S.me = u.patientId; S.app = P(S.me).app; } else { S.me = null; S.app = null; }
+}
+function loginAs(u, msg) { DB.session = {email: u.email}; applySession(); S.proTab = "resumen"; S.proPatient = null; closeModal(); go(u.role === "pro" ? "panel" : "app"); toast(msg || `Hola, ${firstName(u.name)}.`); }
+function logout() { DB.session = null; applySession(); go("presentacion"); toast("Cerraste sesión."); }
+function resetDemo() { DB = seedDB(); applySession(); go("ingresar"); toast("Datos de demo restablecidos."); }
+function makeCode(name) { let c; do { c = "NMO-" + (initials(name) || "XX") + String(Math.floor(10 + Math.random() * 90)); } while (Object.values(DB.pros).some(W => W.pro.code === c)); return c; }
+
+function renderNav() {
+  const u = currentUser();
+  const tabs = [["presentacion","Presentación"]];
+  if (u && u.role === "pro") tabs.push(["panel","Mi panel"]);
+  if (u && u.role === "pac") tabs.push(["app","Mi espacio"]);
+  $("#nav").innerHTML = `<div class="tabs">${tabs.map(([k, l]) => `<button class="${S.view === k ? "on" : ""}" onclick="go('${k}')">${l}</button>`).join("")}</div>` +
+    (u ? `<div class="user"><span class="av" style="width:32px;height:32px;font-size:12px;background:var(--green)">${initials(u.name)}</span><span class="uname">${esc(u.name)}<small>${u.role === "pro" ? "Profesional" : "Paciente"}</small></span><button class="reset" onclick="logout()">Cerrar sesión</button></div>`
+       : `<button class="reset" onclick="go('ingresar')">Ingresar</button><button class="btn sm" onclick="go('registro')">Crear cuenta</button>`);
+}
+const DEMO_NOTE = `<div class="demo-warn"><b>Versión demo.</b> Las cuentas se guardan solo en este navegador y no tienen seguridad real. No uses una contraseña que ocupes en otros sitios.</div>`;
+function vLogin() {
+  const demos = DB.users.filter(u => u.email.endsWith(".demo"));
+  return `<div class="auth">
+    <div class="card auth-card">
+      <div style="text-align:center">${flower(5, 56)}<h2 style="font-size:26px;margin-top:4px">Ingresar</h2><p class="muted tiny" style="margin:4px 0 0">Para profesionales, centros y pacientes.</p></div>
+      <button class="gbtn" type="button" onclick="googleModal()"><span class="gdot">G</span>Continuar con Google</button>
+      <div class="or"><span>o con tu correo</span></div>
+      <form onsubmit="event.preventDefault();doLogin()">
+        <label>Correo</label><input class="field" id="li-email" type="email" required autocomplete="off" placeholder="tu@correo.cl">
+        <label>Contraseña</label><input class="field" id="li-pass" type="password" required autocomplete="off" placeholder="••••••••">
+        <div id="li-err" class="err"></div>
+        <button class="btn" style="width:100%" type="submit">Ingresar</button>
+      </form>
+      <div class="row tiny" style="justify-content:space-between;margin-top:14px"><a href="#" onclick="event.preventDefault();forgotModal()">¿Olvidaste tu contraseña?</a><a href="#registro" onclick="event.preventDefault();go('registro')">Crear cuenta</a></div>
+    </div>
+    <div class="card demo-card">
+      <b>Cuentas de prueba</b>
+      <p class="tiny muted" style="margin:4px 0 10px">Toca una para completar los datos y luego “Ingresar”.</p>
+      ${demos.map(u => `<button class="acct" onclick="fillDemo('${u.email}','${u.pass}')"><span class="av" style="width:34px;height:34px;font-size:12px;background:${u.role === "pro" ? "var(--green)" : "var(--blue)"}">${initials(u.name)}</span><span style="flex:1;text-align:left"><b style="font-size:14px">${esc(u.name)}</b><span class="tiny muted" style="display:block">${u.role === "pro" ? "Profesional" : "Paciente"} · ${esc(u.email)}</span></span><code>${esc(u.pass)}</code></button>`).join("")}
+      ${DEMO_NOTE}
+      <button class="reset" style="margin-top:12px" onclick="resetDemo()">Restablecer datos de demo</button>
+    </div>
+  </div>`;
+}
+function fillDemo(e, p) { $("#li-email").value = e; $("#li-pass").value = p; $("#li-err").textContent = ""; }
+function doLogin() {
+  const e = $("#li-email").value.trim().toLowerCase(), p = $("#li-pass").value;
+  const u = DB.users.find(x => x.email === e);
+  if (!u || u.pass !== p) { $("#li-err").textContent = "Correo o contraseña incorrectos."; return; }
+  loginAs(u);
+}
+function googleModal() {
+  $("#modal-root").innerHTML = `<div class="modal" onclick="if(event.target===this)closeModal()"><div class="in" style="max-width:440px">
+    <span class="pill" style="background:var(--rose2);color:#8a4632">Simulación</span>
+    <h3 style="font-size:21px;margin-top:10px">Elige una cuenta</h3>
+    <p class="tiny muted">En la versión real aquí se abriría Google para confirmar tu identidad. En la demo puedes entrar con cualquier cuenta creada en este navegador.</p>
+    ${DB.users.map((u, i) => `<button class="acct" onclick="loginAs(DB.users[${i}])"><span class="av" style="width:34px;height:34px;font-size:12px;background:${u.role === "pro" ? "var(--green)" : "var(--blue)"}">${initials(u.name)}</span><span style="flex:1;text-align:left"><b style="font-size:14px">${esc(u.name)}</b><span class="tiny muted" style="display:block">${esc(u.email)}</span></span></button>`).join("")}
+    <div class="row" style="margin-top:14px;justify-content:space-between"><button class="btn ghost sm" onclick="closeModal();go('registro')">Crear una cuenta nueva</button><button class="reset" onclick="closeModal()">Cancelar</button></div>
+  </div></div>`;
+}
+function forgotModal() {
+  $("#modal-root").innerHTML = `<div class="modal" onclick="if(event.target===this)closeModal()"><div class="in" style="max-width:420px">
+    <h3 style="font-size:21px">Recuperar contraseña</h3>
+    <p class="muted" style="font-size:14px">En la versión real te enviaríamos un correo para crear una nueva. En esta demo no se envían correos.</p>
+    <p class="tiny muted">Las cuentas de prueba usan la contraseña <code>demo1234</code>. Si creaste una cuenta y no recuerdas la clave, crea otra con un correo distinto.</p>
+    <button class="btn sm" onclick="closeModal()">Entendido</button></div></div>`;
+}
+function vRegistro() {
+  const r = S.reg || (S.reg = {role: "pro"});
+  return `<div class="auth">
+    <div class="card auth-card" style="max-width:480px">
+      <div style="text-align:center"><h2 style="font-size:26px">Crear cuenta</h2><p class="muted tiny" style="margin:4px 0 0">Elige cómo vas a usar No Me Olvides.</p></div>
+      <div class="seg" style="margin:16px 0 4px"><button type="button" class="${r.role === "pro" ? "on" : ""}" onclick="S.reg.role='pro';render()">Soy profesional o centro</button><button type="button" class="${r.role === "pac" ? "on" : ""}" onclick="S.reg.role='pac';render()">Soy paciente</button></div>
+      <button class="gbtn" type="button" onclick="googleSignup()"><span class="gdot">G</span>Registrarme con Google</button>
+      <div class="or"><span>o con tu correo</span></div>
+      <form onsubmit="event.preventDefault();doRegister()">
+        <label>Nombre y apellido</label><input class="field" id="rg-name" required autocomplete="off">
+        ${r.role === "pro" ? `
+        <label>Profesión</label><select class="field" id="rg-prof"><option value="Ps.">Psicólogo/a</option><option value="Dr/a.">Psiquiatra</option><option value="T.O.">Terapeuta ocupacional</option><option value="">Clínica o centro de salud</option></select>
+        <label>Ciudad</label><input class="field" id="rg-city" placeholder="Ej: Viña del Mar" autocomplete="off">` : `
+        <label>Código de tu profesional</label><input class="field" id="rg-code" required placeholder="Ej: NMO-CF24" style="text-transform:uppercase" autocomplete="off">
+        <div class="tiny muted" style="margin:-6px 0 10px">Te lo entrega tu psicólogo/a o tu centro de salud.</div>`}
+        <label>Correo</label><input class="field" id="rg-email" type="email" required autocomplete="off">
+        <label>Contraseña</label><input class="field" id="rg-pass" type="password" minlength="6" required placeholder="Mínimo 6 caracteres" autocomplete="new-password">
+        <div id="rg-err" class="err"></div>
+        <button class="btn" style="width:100%" type="submit">Crear cuenta</button>
+      </form>
+      <p class="tiny muted" style="text-align:center;margin-top:12px">¿Ya tienes cuenta? <a href="#ingresar" onclick="event.preventDefault();go('ingresar')">Ingresar</a></p>
+      ${DEMO_NOTE}
+    </div>
+  </div>`;
+}
+function googleSignup() {
+  $("#modal-root").innerHTML = `<div class="modal" onclick="if(event.target===this)closeModal()"><div class="in" style="max-width:420px">
+    <span class="pill" style="background:var(--rose2);color:#8a4632">Simulación</span>
+    <h3 style="font-size:21px;margin-top:10px">Registro con Google</h3>
+    <p class="muted" style="font-size:14px">En la versión real, Google completaría tu nombre y correo automáticamente. En la demo, complétalos en el formulario.</p>
+    <button class="btn sm" onclick="closeModal();document.getElementById('rg-name').focus()">Ir al formulario</button></div></div>`;
+}
+function doRegister() {
+  const role = S.reg.role, name = $("#rg-name").value.trim(), email = $("#rg-email").value.trim().toLowerCase(), pass = $("#rg-pass").value, err = $("#rg-err");
+  if (DB.users.some(u => u.email === email)) { err.textContent = "Ya existe una cuenta con ese correo."; return; }
+  if (role === "pro") {
+    const prof = $("#rg-prof").value, city = $("#rg-city").value.trim();
+    const id = "pro-" + Date.now().toString(36), code = makeCode(name);
+    DB.pros[id] = {pro: {id, name: (prof ? prof + " " : "") + name, place: (prof ? "Consulta particular" : "Centro de salud") + (city ? " · " + city : ""), code, plan: "gratis"}, patients: []};
+    const u = {email, pass, role: "pro", proId: id, name};
+    DB.users.push(u); S.reg = null; loginAs(u, `Cuenta creada. Tu código para invitar pacientes es ${code}.`);
+  } else {
+    const code = $("#rg-code").value.trim().toUpperCase();
+    const proId = Object.keys(DB.pros).find(k => DB.pros[k].pro.code === code);
+    if (!proId) { err.textContent = "No encontramos ese código. Revísalo con tu profesional."; return; }
+    const W = DB.pros[proId], pid = "p-" + Date.now().toString(36);
+    W.patients.push({id: pid, name: shortName(name), age: "", color: COLORS[W.patients.length % COLORS.length], obj: "Por definir", since: `${MESES[TODAY.getMonth()]} ${TODAY.getFullYear()}`, next: "Por agendar", mood: Array(14).fill(null), emos: {}, assigned: [], done: [], notes: "", lastActive: 0, sos: false, app: defaultApp()});
+    const u = {email, pass, role: "pac", proId, patientId: pid, name};
+    DB.users.push(u); S.reg = null; loginAs(u, `Cuenta creada y vinculada a ${W.pro.name}.`);
+  }
+}
+
 const P = id => S.patients.find(p => p.id === id);
 const ME = () => P(S.me);
 
-function toast(msg) { const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3200); }
+function toast(msg) { document.querySelectorAll(".toast").forEach(x => x.remove()); const t = document.createElement("div"); t.className = "toast"; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3200); }
 
 /* ================= métricas ================= */
 const recentMoods = p => p.mood.filter(v => v != null);
@@ -359,19 +533,24 @@ function spark(p) {
   const w = 90, h = 26;
   let path = "", pen = false;
   p.mood.forEach((v, i) => { if (v == null) { pen = false; return; } path += `${pen ? "L" : "M"}${(i * w / 13).toFixed(1)},${(h - 3 - (v - 1) / 4 * (h - 6)).toFixed(1)} `; pen = true; });
-  return `<svg width="${w}" height="${h}" aria-hidden="true"><path d="${path}" fill="none" stroke="#5b7fc7" stroke-width="1.8"/></svg>`;
+  const li = p.mood.map((v, i) => v == null ? -1 : i).filter(i => i >= 0).pop();
+  const dot = li == null ? "" : `<circle cx="${(li * w / 13).toFixed(1)}" cy="${(h - 3 - (p.mood[li] - 1) / 4 * (h - 6)).toFixed(1)}" r="2.5" fill="#5b7fc7"/>`;
+  return `<svg width="${w}" height="${h}" aria-hidden="true"><path d="${path}" fill="none" stroke="#5b7fc7" stroke-width="1.8"/>${dot}</svg>`;
 }
 
 /* ================= vistas ================= */
 function render() {
-  document.querySelectorAll(".tabs button").forEach(b => b.classList.toggle("on", b.dataset.view === S.view));
+  const u = currentUser();
+  if (S.view === "panel" && !(u && u.role === "pro")) S.view = u ? "app" : "ingresar";
+  if (S.view === "app" && !(u && u.role === "pac")) S.view = u ? "panel" : "ingresar";
+  if ((S.view === "ingresar" || S.view === "registro") && u) S.view = u.role === "pro" ? "panel" : "app";
+  renderNav();
   const m = $("#main");
-  if (S.view === "presentacion") m.innerHTML = vPresentacion();
-  else if (S.view === "panel") m.innerHTML = vPanel();
-  else m.innerHTML = vApp();
+  m.innerHTML = S.view === "presentacion" ? vPresentacion() : S.view === "panel" ? vPanel() : S.view === "app" ? vApp() : S.view === "registro" ? vRegistro() : vLogin();
+  if (location.hash.slice(1) !== S.view) history.replaceState(null, "", "#" + S.view);
   save();
 }
-function go(view) { S.view = view; if (location.hash !== "#" + view) history.replaceState(null, "", "#" + view); render(); window.scrollTo(0, 0); }
+function go(view) { S.view = view; render(); window.scrollTo(0, 0); }
 
 /* ---------- Presentación ---------- */
 function vPresentacion() {
@@ -382,8 +561,8 @@ function vPresentacion() {
       <h1 style="margin-top:14px">Lo que pasa entre sesiones también es parte del proceso. <em>Acompáñalo.</em></h1>
       <p class="lead">No Me Olvides es una plataforma de bienestar creativo que el profesional ofrece a sus pacientes. Actividades de arte, escritura y lectura curadas por expertos, un registro emocional simple y una comunidad, todo conectado con la consulta.</p>
       <div class="row" style="flex-wrap:wrap">
-        <button class="btn" onclick="go('panel')">Ver panel profesional</button>
-        <button class="btn ghost" onclick="go('app')">Ver app del paciente</button>
+        <button class="btn" onclick="go('registro')">Crear cuenta gratis</button>
+        <button class="btn ghost" onclick="go('ingresar')">Ingresar</button>
       </div>
     </div>
     <div class="hero-art">${flower(5, 300)}</div>
@@ -492,15 +671,15 @@ function vPanel() {
   const pl = PLANS[S.pro.plan], used = Math.min(S.patients.length, pl.cupo);
   return `<div class="pro">
     <aside class="card side">
-      <div class="who"><div class="av" style="background:var(--green)">CF</div><div><b style="font-size:14px">${esc(S.pro.name)}</b><div class="tiny muted">${esc(S.pro.place)}</div></div></div>
+      <div class="who"><div class="av" style="background:var(--green)">${initials(S.pro.name)}</div><div><b style="font-size:14px">${esc(S.pro.name)}</b><div class="tiny muted">${esc(S.pro.place)}</div></div></div>
       <nav>${tabs.map(([k, l]) => `<button class="${S.proTab === k ? "on" : ""}" onclick="proGo('${k}')">${l}${k === "resumen" && nAlert && !isFree() ? `<span class="badge">${nAlert}</span>` : ""}</button>`).join("")}</nav>
       <div class="planbox">
         <div class="row" style="justify-content:space-between"><b style="font-size:13px">Plan ${pl.n}</b>${isFree() ? "" : `<span class="pill">Activo</span>`}</div>
-        ${isFree() ? `<div class="tiny muted" style="margin-top:4px">${used} de ${pl.cupo} pacientes</div><div class="bar" style="width:100%;margin-top:6px"><i style="width:100%;background:var(--rose)"></i></div>
-        <div class="tiny" style="margin-top:8px">${S.patients.length - pl.cupo} pacientes esperando cupo</div>
+        ${isFree() ? `<div class="tiny muted" style="margin-top:4px">${used} de ${pl.cupo} pacientes</div><div class="bar" style="width:100%;margin-top:6px"><i style="width:${used / pl.cupo * 100}%;background:${used >= pl.cupo ? "var(--rose)" : "var(--green2)"}"></i></div>
+        ${S.patients.length > pl.cupo ? `<div class="tiny" style="margin-top:8px">${S.patients.length - pl.cupo} pacientes esperando cupo</div>` : ""}
         <button class="btn sm" style="width:100%;margin-top:10px" onclick="upgradeModal()">Mejorar a Pro</button>` : `<div class="tiny muted" style="margin-top:4px">${S.patients.length} pacientes activos</div>`}
       </div>
-      <div class="demo-sw"><div class="tiny muted" style="margin-bottom:6px">Ver la demo como</div><div class="seg">${Object.entries(PLANS).map(([k, v]) => `<button class="${S.pro.plan === k ? "on" : ""}" onclick="S.pro.plan='${k}';if(S.proTab==='equipo'&&'${k}'!=='centro')S.proTab='resumen';render()">${v.n}</button>`).join("")}</div></div>
+      <div class="demo-sw"><div class="tiny muted" style="margin-bottom:6px">Modo presentación: ver como</div><div class="seg">${Object.entries(PLANS).map(([k, v]) => `<button class="${S.pro.plan === k ? "on" : ""}" onclick="S.pro.plan='${k}';if(S.proTab==='equipo'&&'${k}'!=='centro')S.proTab='resumen';render()">${v.n}</button>`).join("")}</div></div>
     </aside>
     <section>${body}</section>
   </div>`;
@@ -519,14 +698,14 @@ function proResumen(allSignals) {
   const waiting = S.patients.length - ps.length;
   return `
   <div class="row" style="justify-content:space-between;margin-bottom:16px;flex-wrap:wrap">
-    <div><h2 style="font-size:28px">Hola, Camila</h2><div class="muted">Lunes 16 de noviembre · Tienes 4 sesiones esta semana con pacientes de la plataforma</div></div>
+    <div><h2 style="font-size:28px">Hola, ${esc(firstName(S.pro.name))}</h2><div class="muted">${cap(longDate())} · ${S.patients.length} paciente${S.patients.length === 1 ? "" : "s"} vinculado${S.patients.length === 1 ? "" : "s"} · Código ${S.pro.code}</div></div>
   </div>
   ${isFree() && waiting ? `<div class="upsell"><div style="flex:1"><b>${waiting} pacientes aceptaron tu invitación y están esperando cupo.</b><div class="tiny" style="opacity:.85">El plan Gratis acompaña hasta 3. Con Pro sigues a hasta 25 y ves las señales antes de cada sesión.</div></div><button class="btn" style="background:#fff;color:var(--ink)" onclick="upgradeModal()">Probar Pro 14 días gratis</button></div>` : ""}
   <div class="kpis">
     <div class="card kpi"><div class="v">${active}<span class="muted" style="font-size:16px"> / ${ps.length}</span></div><div class="l">Pacientes activos (últimos 3 días)</div></div>
     <div class="card kpi"><div class="v">${adh}%</div><div class="l">Adherencia promedio semanal</div></div>
     <div class="card kpi"><div class="v">${acts}</div><div class="l">Actividades completadas esta semana</div></div>
-    <div class="card kpi"><div class="v">${avg(ps.flatMap(p => p.mood.slice(7).filter(v => v != null))).toFixed(1)}</div><div class="l">Ánimo promedio (escala 1–5)</div></div>
+    <div class="card kpi"><div class="v">${(() => { const v = ps.flatMap(p => p.mood.slice(7).filter(x => x != null)); return v.length ? avg(v).toFixed(1) : "–"; })()}</div><div class="l">Ánimo promedio (escala 1–5)</div></div>
   </div>
   <div class="two">
     <div class="card">
@@ -542,6 +721,7 @@ function proResumen(allSignals) {
   </div>`;
 }
 function tablaPacientes() {
+  if (!S.patients.length) return `<div class="signal muted" style="padding:18px">Aún no tienes pacientes. Comparte tu código <b>${S.pro.code}</b> desde <a href="#" onclick="event.preventDefault();proGo('invitar')">Invitar pacientes</a>.</div>`;
   return `<table><thead><tr><th>Paciente</th><th>Ánimo 14 días</th><th>Adherencia</th><th>Últ. actividad</th></tr></thead><tbody>
   ${S.patients.map(p => { const ad = adherence(p); const lk = patLocked(p); return `<tr class="click ${lk ? "locked" : ""}" onclick="openPatient('${p.id}')">
     <td><div class="row"><div class="av" style="background:${lk ? "#bdb6a8" : p.color};width:32px;height:32px;font-size:12px">${p.name.split(" ").map(x => x[0]).join("")}</div><div><b>${esc(p.name)}</b><div class="tiny muted">${lk ? "Esperando cupo" : esc(p.obj)}</div></div></div></td>
@@ -566,7 +746,7 @@ function proDetalle(p) {
   <button class="back" onclick="proGo('pacientes')">← Pacientes</button>
   <div class="card det-head">
     <div class="av" style="background:${p.color};width:54px;height:54px;font-size:18px">${p.name.split(" ").map(x => x[0]).join("")}</div>
-    <div style="flex:1"><h2 style="font-size:24px">${esc(p.name)}</h2><div class="muted tiny">${p.age} años · Foco: ${esc(p.obj)} · En la plataforma desde ${p.since} · Próxima sesión: ${p.next}</div></div>
+    <div style="flex:1"><h2 style="font-size:24px">${esc(p.name)}</h2><div class="muted tiny">${p.age ? p.age + " años · " : ""}Foco: ${esc(p.obj)} · En la plataforma desde ${p.since} · Próxima sesión: ${p.next}</div></div>
     <button class="btn" onclick="assignModal('${p.id}')">Asignar actividad</button>
   </div>
   ${isFree() ? (sosSig.length ? `<div class="card" style="margin-top:16px">${sosSig.map(s => `<div class="signal"><span class="dot" style="background:${s.c}"></span><div><b>${esc(s.t)}</b><div class="tiny muted">${esc(s.s)} Los avisos de ayuda se muestran en todos los planes.</div></div></div>`).join("")}</div>` : "")
@@ -602,7 +782,7 @@ function doAssign(pid, aid) {
   p.assigned = p.assigned.filter(x => x.a !== aid);
   p.assigned.unshift({a: aid, note, date: 0});
   closeModal(); render();
-  toast(pid === S.me ? `Listo. Abre “App del paciente” para ver cómo le llega a ${p.name.split(" ")[0]}.` : `Actividad asignada a ${p.name}.`);
+  toast(`Actividad asignada a ${p.name}. La verá al entrar a su cuenta.`);
 }
 function proBiblioteca() {
   const f = S.libFilter;
@@ -614,7 +794,8 @@ function proBiblioteca() {
   <div class="lib">${list.map(a => { const T = TYPES[a.type]; const lk = actLocked(a.id); return `<div class="card act ${lk ? "act-locked" : ""}" ${lk ? `onclick="upgradeModal()" style="cursor:pointer"` : ""}><span class="typ" style="color:${T.c}">${T.i} ${a.type} · ${a.min} min ${lk ? `<span style="float:right;color:var(--ink)">${LOCK} Pro</span>` : ""}</span><h4>${esc(a.t)}</h4><div class="muted" style="font-size:14px">${esc(a.d)}</div><div style="margin-top:auto;padding-top:6px">${a.obj.map(o => `<span class="chip">${o}</span>`).join("")}</div></div>`; }).join("")}</div>`;
 }
 function proInvitar() {
-  const msg = `Hola, te quiero invitar a No Me Olvides, una app de bienestar creativo que vamos a usar como complemento entre sesiones. Es gratis para ti mientras estemos trabajando juntos. Descárgala e ingresa mi código: ${S.pro.code}`;
+  const link = location.href.split('#')[0] + '#registro';
+  const msg = `Hola, te quiero invitar a No Me Olvides, una app de bienestar creativo que vamos a usar como complemento entre sesiones. Es gratis para ti mientras estemos trabajando juntos. Crea tu cuenta en ${link} con la opción "Soy paciente" e ingresa mi código: ${S.pro.code}`;
   const pl = PLANS[S.pro.plan], full = S.patients.length >= pl.cupo;
   return `<h2 style="font-size:28px">Invitar pacientes</h2><p class="muted">Tus pacientes entran gratis con tu código mientras estén en tratamiento contigo. Ellos nunca pagan por tu plan.</p>
   ${full && isFree() ? `<div class="upsell" style="margin-top:14px"><div style="flex:1"><b>Llegaste al máximo del plan Gratis (3 pacientes).</b><div class="tiny" style="opacity:.85">Puedes seguir invitando, pero los nuevos quedarán esperando cupo hasta que mejores tu plan.</div></div><button class="btn" style="background:#fff;color:var(--ink)" onclick="upgradeModal()">Mejorar a Pro</button></div>` : ""}
@@ -627,10 +808,10 @@ function proInvitar() {
   </div>
   <div class="card" style="padding:20px;margin-top:16px"><h3 style="font-size:18px;margin-bottom:6px">Qué ve tu paciente al entrar</h3>
     <ol class="steps"><li>Ingresa tu código y queda vinculado a tu consulta.</li><li>Decide qué compartir contigo (check-ins, actividades, reflexiones). Puede cambiarlo cuando quiera.</li><li>Hace un test corto de perfil creativo y recibe sus primeras actividades.</li></ol>
-    <button class="btn ghost sm" onclick="S.app.onboarded=false;S.app.step=0;go('app')">Probar el ingreso como paciente</button></div>`;
+    <div class="tiny muted">Link de registro: <code>${esc(location.href.split('#')[0] + '#registro')}</code></div></div>`;
 }
 function proEquipo() {
-  const team = [["Ps. Camila Fuentes", 6, 71], ["Ps. Andrés Vidal", 14, 64], ["Ps. Fernanda Soto", 9, 78], ["Ps. Rodrigo Pinto", 11, 58], ["T.O. Daniela Ríos", 7, 82]];
+  const team = [[S.pro.name, S.patients.length, Math.round(avg(S.patients.map(adherence)))], ["Ps. Andrés Vidal", 14, 64], ["Ps. Fernanda Soto", 9, 78], ["Ps. Rodrigo Pinto", 11, 58], ["T.O. Daniela Ríos", 7, 82]];
   return `<h2 style="font-size:28px">Equipo del centro</h2><p class="muted">Datos agregados y anónimos. Ningún profesional ve los pacientes de otro.</p>
   <div class="kpis" style="margin-top:14px"><div class="card kpi"><div class="v">5</div><div class="l">Profesionales</div></div><div class="card kpi"><div class="v">47</div><div class="l">Pacientes activos</div></div><div class="card kpi"><div class="v">70%</div><div class="l">Adherencia promedio</div></div><div class="card kpi"><div class="v">1</div><div class="l">Taller del trimestre (dic)</div></div></div>
   <div class="card" style="margin-top:16px"><table><thead><tr><th>Profesional</th><th>Pacientes</th><th>Adherencia de sus pacientes</th></tr></thead><tbody>${team.map(([n, k, a]) => `<tr><td><b>${n}</b></td><td>${k}</td><td><div class="bar" style="width:160px"><i style="width:${a}%"></i></div><div class="tiny muted">${a}%</div></td></tr>`).join("")}</tbody></table></div>`;
@@ -639,32 +820,27 @@ function copyInv() { const v = $("#inv-msg").value; try { navigator.clipboard.wr
 
 /* ---------- App paciente ---------- */
 function vApp() {
-  const me = ME();
+  const me = ME(), c = S.app.consent;
   return `<div class="app-stage">
     <div class="app-side">
-      <span class="pill">Vista paciente</span>
-      <h2 style="margin-top:10px">Así lo vive ${esc(me.name.split(" ")[0])}</h2>
-      <p class="muted">Todo lo que haga acá aparece en el panel de su psicóloga, solo si ella lo autorizó.</p>
-      <div class="card" style="padding:16px;margin-top:14px">
-        <b style="font-size:14px">Prueba esto en la demo</b>
-        <ol class="steps tiny" style="font-size:13.5px"><li>Haz el ingreso con el código.</li><li>Registra cómo está tu flor hoy.</li><li>Completa una actividad y compártela.</li><li>Vuelve al <a href="#panel" onclick="event.preventDefault();openPatient('${me.id}')">panel profesional</a> y mira la ficha de ${esc(me.name.split(" ")[0])}.</li></ol>
-      </div>
+      <span class="pill">Mi espacio</span>
+      <h2 style="margin-top:10px">Hola, ${esc(firstName(me.name))}</h2>
+      <p class="muted">Tu cuenta está vinculada a <b>${esc(S.pro.name)}</b>. Solo ve lo que tú autorizas.</p>
+      ${S.app.onboarded ? `<div class="card" style="padding:16px;margin-top:14px">
+        <b style="font-size:14px">Lo que compartes</b>
+        <ul class="tiny" style="padding-left:18px;font-size:13.5px;margin:8px 0 10px">
+          <li>Cómo está tu flor: <b>${c.checkins ? "sí" : "no"}</b></li>
+          <li>Actividades completadas: <b>${c.actividades ? "sí" : "no"}</b></li>
+          <li>Reflexiones: <b>solo las que marques</b></li>
+        </ul>
+        <button class="btn ghost sm" onclick="S.app.onboarded=false;S.app.step=1;render()">Cambiar permisos</button>
+      </div>` : ""}
     </div>
     <div class="phone"><div class="screen">
-      <div class="status"><span>9:41</span><span>●●● ▲ ▮</span></div>
+      <div class="status"><span>${String(new Date().getHours()).padStart(2, "0")}:${String(new Date().getMinutes()).padStart(2, "0")}</span><span>●●● ▲ ▮</span></div>
       ${S.app.onboarded ? appMain() : appOnboarding()}
     </div></div>
-    <div class="app-side">
-      <div class="card" style="padding:16px">
-        <b style="font-size:14px">Principios de diseño</b>
-        <ul class="tiny" style="padding-left:18px;font-size:13.5px;margin:8px 0 0">
-          <li>Lenguaje creativo, sin códigos clínicos, para bajar el estigma.</li>
-          <li>El paciente decide qué comparte, y puede cambiarlo.</li>
-          <li>Actividades de 5 a 25 minutos para reducir el abandono.</li>
-          <li>Botón de ayuda siempre visible con derivación a líneas oficiales.</li>
-        </ul>
-      </div>
-    </div>
+    <div class="app-side"></div>
   </div>`;
 }
 
@@ -689,10 +865,10 @@ function appOnboarding() {
     const c = a.consent;
     const t = (k, title, desc) => `<div class="tog"><div><b style="font-size:14px">${title}</b><div class="tiny muted">${desc}</div></div><button class="sw ${c[k] ? "on" : ""}" aria-pressed="${c[k]}" aria-label="${title}" onclick="S.app.consent.${k}=!S.app.consent.${k};render()"></button></div>`;
     return `<div class="scr"><div class="a-h">Tú decides qué compartir</div>
-      <p class="muted tiny">Quedaste vinculada a <b>${esc(S.pro.name)}</b>. Elige qué puede ver. Puedes cambiarlo cuando quieras desde tu perfil.</p>
+      <p class="muted tiny">Tu cuenta quedó vinculada a <b>${esc(S.pro.name)}</b>. Elige qué puede ver. Puedes cambiarlo cuando quieras desde tu perfil.</p>
       <div class="a-card" style="padding:4px 16px">${t("checkins","Cómo está mi flor","Tu registro diario de ánimo")}${t("actividades","Actividades completadas","Qué hiciste y cuándo")}${t("reflexiones","Reflexiones por defecto","Si está apagado, eliges una por una")}</div>
       <div class="a-card tiny muted">Tu diario personal nunca se comparte salvo que tú lo marques. No vendemos ni usamos tus datos para publicidad. No Me Olvides no es una terapia ni reemplaza a tu psicólogo/a.</div>
-      <button class="a-btn" onclick="S.app.step=2;S.app.answers=[];render()">Acepto y continúo</button></div>`;
+      <button class="a-btn" onclick="if(S.app.profile){S.app.onboarded=true;S.app.step=3}else{S.app.step=2;S.app.answers=[]}render()">Acepto y continúo</button></div>`;
   }
   if (st === 2) {
     const qi = a.answers.length, Q = QUIZ[qi];
@@ -703,11 +879,11 @@ function appOnboarding() {
   const pr = PROFILES[a.profile];
   return `<div class="scr" style="text-align:center;display:flex;flex-direction:column;justify-content:center">
     <div class="tiny muted">Tu perfil creativo</div><div class="a-h" style="font-size:30px">${pr[0]}</div><p class="muted">${pr[1]}</p>
-    <div class="a-card" style="text-align:left"><b style="font-size:14px">Preparamos para ti</b><div class="tiny muted">Una ruta de inicio de 7 días con actividades de ${a.profile.toLowerCase()} y las tareas que te deje tu psicóloga.</div></div>
+    <div class="a-card" style="text-align:left"><b style="font-size:14px">Preparamos para ti</b><div class="tiny muted">Una ruta de inicio de 7 días con actividades de ${a.profile.toLowerCase()} y las tareas que te deje tu profesional.</div></div>
     <button class="a-btn" onclick="S.app.onboarded=true;S.app.tab='hoy';render()">Empezar</button></div>`;
 }
 function checkCode() { const v = ($("#code").value || "").trim().toUpperCase(); if (v !== S.pro.code) { toast("Código no reconocido. En la demo usa " + S.pro.code); return; } S.app.step = 1; render(); }
-function answer(v) { S.app.answers.push(v); if (S.app.answers.length >= QUIZ.length) { S.app.profile = S.app.answers[0]; S.app.step = 3; } render(); }
+function answer(v) { S.app.answers.push(v); if (S.app.answers.length >= QUIZ.length) { S.app.profile = S.app.answers[0]; S.app.step = 3; const me = ME(); if (me && me.obj === "Por definir") me.obj = S.app.answers[2]; } render(); }
 
 const ICONS = {
   hoy:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3M5.6 5.6l2 2M16.4 16.4l2 2M5.6 18.4l2-2M16.4 7.6l2-2"/></svg>`,
@@ -733,16 +909,16 @@ function appHoy() {
   const pend = me.assigned.filter(as => !me.done.some(d => d.a === as.a && d.date <= as.date));
   const doneAssigned = me.assigned.filter(as => me.done.some(d => d.a === as.a && d.date <= as.date));
   const streak = (() => { let n = 0; for (let i = 13; i >= 0; i--) { if (me.mood[i] != null) n++; else if (i === 13) continue; else break; } return n; })();
-  const checkin = a.checkedToday ? `<div class="a-card" style="display:flex;gap:12px;align-items:center">${flower(a.mood, 54)}<div><b>Hoy tu flor está ${MOODS[a.mood].toLowerCase()}</b><div class="tiny muted">${a.emos.length ? a.emos.join(", ") : "Registrado"} · ${streak} días registrando</div></div></div>` :
+  const checkin = a.checkedToday ? `<div class="a-card" style="display:flex;gap:12px;align-items:center">${flower(a.mood, 54)}<div><b>Hoy tu flor está ${MOODS[a.mood].toLowerCase()}</b><div class="tiny muted">${a.emos.length ? a.emos.join(", ") : "Registrado"} · ${streak} día${streak === 1 ? "" : "s"} registrando</div></div></div>` :
     `<div class="a-card"><b>¿Cómo está tu flor hoy?</b>
       <div class="moods">${[1,2,3,4,5].map(v => `<button class="${a.mood === v ? "on" : ""}" onclick="S.app.mood=${v};render()">${flower(v, 46)}${MOODS[v]}</button>`).join("")}</div>
       ${a.mood ? `<div class="tiny muted" style="margin-top:8px">¿Qué hay en ella? (opcional)</div>
       <div class="emos">${["Calma","Cansancio","Ansiedad","Alegría","Tristeza","Rabia","Gratitud","Soledad"].map(e => `<button class="${a.emos.includes(e) ? "on" : ""}" onclick="toggleEmo('${e}')">${e}</button>`).join("")}</div>
       <textarea class="a-in" rows="2" placeholder="Una línea sobre tu día (solo para ti)" oninput="S.app.moodNote=this.value">${esc(a.moodNote)}</textarea>
       <button class="a-btn" onclick="saveCheckin()">Guardar</button>` : ""}</div>`;
-  return `<div class="a-h">Hola, ${esc(me.name.split(" ")[0])}</div><div class="tiny muted">${DIAS[TODAY.getDay()]} 16 de noviembre</div>
+  return `<div class="a-h">Hola, ${esc(me.name.split(" ")[0])}</div><div class="tiny muted">${longDate()}</div>
     ${checkin}
-    <div style="margin-top:18px"><b>De tu psicóloga</b><div class="from" style="margin-top:2px"><span class="av" style="width:18px;height:18px;font-size:9px;background:var(--green)">CF</span>${esc(S.pro.name)}</div></div>
+    <div style="margin-top:18px"><b>De tu profesional</b><div class="from" style="margin-top:2px"><span class="av" style="width:18px;height:18px;font-size:9px;background:var(--green)">${initials(S.pro.name)}</span>${esc(S.pro.name)}</div></div>
     ${pend.length ? pend.map(as => taskBtn(as)).join("") : `<div class="a-card tiny muted">No tienes actividades pendientes. Puedes explorar una ruta.</div>`}
     ${doneAssigned.map(as => taskBtn(as, true)).join("")}
     <div style="margin-top:18px"><b>Para ti hoy</b></div>
@@ -758,7 +934,7 @@ function saveCheckin() {
   const me = ME(), a = S.app;
   if (a.consent.checkins) { me.mood[13] = a.mood; a.emos.forEach(e => me.emos[e] = (me.emos[e] || 0) + 1); }
   me.lastActive = 0; a.checkedToday = true;
-  render(); toast(a.consent.checkins ? "Guardado. Tu psicóloga verá cómo estuvo tu semana." : "Guardado solo para ti.");
+  render(); toast(a.consent.checkins ? "Guardado. Tu profesional verá cómo estuvo tu semana." : "Guardado solo para ti.");
 }
 function openAct(id) { S.app.open = id; S.app.actText = ""; S.app.actImg = null; S.app.actShared = true; render(); const s = $("#scr"); if (s) s.scrollTop = 0; }
 function appActividad(x) {
@@ -766,12 +942,12 @@ function appActividad(x) {
   const as = me.assigned.find(z => z.a === x.id);
   return `<button class="back" onclick="S.app.open=null;render()">← Volver</button>
     <div class="a-card" style="background:${T.bg};border-color:transparent;margin-top:4px"><span class="typ" style="color:${T.c}">${T.i} ${x.type} · ${x.min} min</span><div class="a-h" style="font-size:22px">${esc(x.t)}</div><div style="font-size:14px">${esc(x.d)}</div>
-    ${as && as.note ? `<div class="from" style="margin-top:10px;color:#2d4a85">Camila te dejó: “${esc(as.note)}”</div>` : ""}</div>
+    ${as && as.note ? `<div class="from" style="margin-top:10px;color:#2d4a85">${esc(firstName(S.pro.name))} te dejó: “${esc(as.note)}”</div>` : ""}</div>
     <div class="a-card"><b style="font-size:14px">Paso a paso</b><ol class="steps" style="font-size:14px">${x.steps.map(s => `<li>${esc(s)}</li>`).join("")}</ol></div>
     <div class="a-card"><b style="font-size:14px">${esc(x.q)}</b>
       <textarea class="a-in" rows="3" style="margin-top:8px" placeholder="Escribe lo que quieras…" oninput="S.app.actText=this.value">${esc(a.actText)}</textarea>
       <label class="upl">${a.actImg ? `<img src="${a.actImg}" alt="Tu creación">` : "＋ Subir una foto de tu creación (opcional)"}<input type="file" accept="image/*" class="hidden" onchange="pickImg(this)"></label>
-      <div class="tog" style="border:0;padding-bottom:0"><div><b style="font-size:14px">Compartir con mi psicóloga</b><div class="tiny muted">Lo verá antes de tu próxima sesión</div></div><button class="sw ${a.actShared ? "on" : ""}" aria-pressed="${a.actShared}" aria-label="Compartir con mi psicóloga" onclick="S.app.actShared=!S.app.actShared;render()"></button></div>
+      <div class="tog" style="border:0;padding-bottom:0"><div><b style="font-size:14px">Compartir con mi profesional</b><div class="tiny muted">Lo verá antes de tu próxima sesión</div></div><button class="sw ${a.actShared ? "on" : ""}" aria-pressed="${a.actShared}" aria-label="Compartir con mi profesional" onclick="S.app.actShared=!S.app.actShared;render()"></button></div>
     </div>
     <button class="a-btn" onclick="finishAct('${x.id}')">Marcar como hecha</button><div style="height:60px"></div>`;
 }
@@ -787,7 +963,7 @@ function finishAct(id) {
   me.done.push({a: id, date: 0, text: shared ? a.actText.trim() : "", shared, img: shared ? a.actImg : null});
   if (!shared) a.journal.unshift({date: 0, text: `${lib(id).t}: ${a.actText.trim() || "completada"}`, shared: false});
   me.lastActive = 0; a.open = null; a.actImg = null;
-  render(); toast(shared ? "¡Bien hecho! Camila lo verá antes de tu sesión del jueves." : "¡Bien hecho! Quedó guardado en tu diario.");
+  render(); toast(shared ? `¡Bien hecho! ${firstName(S.pro.name)} lo verá antes de tu próxima sesión.` : "¡Bien hecho! Quedó guardado en tu diario.");
 }
 function appRutas() {
   const r = [
@@ -804,7 +980,7 @@ function appDiario() {
   const a = S.app;
   return `<div class="a-h">Mi diario</div><div class="tiny muted">Privado por defecto</div>
     <div class="a-card"><textarea class="a-in" rows="4" placeholder="¿Qué quieres dejar acá hoy?" oninput="S.app.draft=this.value">${esc(a.draft)}</textarea>
-      <div class="tog" style="border:0;padding-bottom:0"><div class="tiny">Compartir esta entrada con mi psicóloga</div><button class="sw ${a.draftShared ? "on" : ""}" aria-pressed="${a.draftShared}" aria-label="Compartir esta entrada" onclick="S.app.draftShared=!S.app.draftShared;render()"></button></div>
+      <div class="tog" style="border:0;padding-bottom:0"><div class="tiny">Compartir esta entrada con mi profesional</div><button class="sw ${a.draftShared ? "on" : ""}" aria-pressed="${a.draftShared}" aria-label="Compartir esta entrada" onclick="S.app.draftShared=!S.app.draftShared;render()"></button></div>
       <button class="a-btn" onclick="saveEntry()">Guardar entrada</button></div>
     ${a.journal.map(e => `<div class="entry"><div class="tiny muted">${e.date === 0 ? "Hoy" : fmtDate(e.date)} ${e.shared ? "· Compartida" : "· Privada"}</div><div style="font-size:14px;margin-top:2px">${esc(e.text)}</div></div>`).join("")}
     <div style="height:50px"></div>`;
@@ -825,31 +1001,31 @@ function appComunidad() {
   return `<div class="a-h">Comunidad</div><div class="tiny muted">Espacios moderados por facilitadores</div>
     <div class="a-card" style="background:var(--blue2);border-color:transparent"><span class="typ" style="color:#2d4a85">Reto de la semana</span><div style="font-family:Fraunces,serif;font-size:18px;font-weight:600">Fotografía algo azul que te dé calma</div><div class="tiny muted">142 personas participando</div></div>
     <div style="margin-top:16px"><b>Próximos encuentros</b></div>
-    ${ev.map(e => `<div class="ev"><div class="d">${e.d}<small>${e.m}</small></div><div style="flex:1"><b style="font-size:14px">${e.t}</b><div class="tiny muted">${e.s}</div></div><button class="btn sm ${j.includes(e.id) ? "ghost" : ""}" onclick="joinEv('${e.id}')">${j.includes(e.id) ? "Inscrita" : "Unirme"}</button></div>`).join("")}
-    <div class="a-card tiny muted">Las conversaciones de la comunidad no se comparten con tu psicóloga.</div><div style="height:50px"></div>`;
+    ${ev.map(e => `<div class="ev"><div class="d">${e.d}<small>${e.m}</small></div><div style="flex:1"><b style="font-size:14px">${e.t}</b><div class="tiny muted">${e.s}</div></div><button class="btn sm ${j.includes(e.id) ? "ghost" : ""}" onclick="joinEv('${e.id}')">${j.includes(e.id) ? "Inscrito/a" : "Unirme"}</button></div>`).join("")}
+    <div class="a-card tiny muted">Las conversaciones de la comunidad no se comparten con tu profesional.</div><div style="height:50px"></div>`;
 }
 function joinEv(id) { const j = S.app.joined; const i = j.indexOf(id); if (i >= 0) j.splice(i, 1); else { j.push(id); toast("Te inscribiste. Te avisaremos un día antes."); } render(); }
 function appSOS() {
   return `<div class="sheet" onclick="if(event.target===this){S.app.sheet=null;render()}"><div class="in">
-    <div class="a-h" style="font-size:22px;margin-top:0">No estás sola</div>
+    <div class="a-h" style="font-size:22px;margin-top:0">No estás solo ni sola</div>
     <p class="tiny muted" style="margin:4px 0 6px">Si estás en peligro o piensas en hacerte daño, llama ahora. Son gratuitas y atienden las 24 horas.</p>
     <a class="help" href="tel:*4141"><span><b>*4141</b><div class="tiny muted">Línea de prevención del suicidio (Minsal)</div></span><span class="pill" style="background:var(--danger);color:#fff">Llamar</span></a>
     <a class="help" href="tel:131"><span><b>131</b><div class="tiny muted">SAMU, urgencias</div></span><span class="pill" style="background:var(--danger);color:#fff">Llamar</span></a>
     <a class="help" href="tel:6003607777"><span><b>600 360 7777</b><div class="tiny muted">Salud Responde</div></span><span class="pill">Llamar</span></a>
-    <button class="a-btn sec" onclick="sosNotify()">Avisar a mi psicóloga</button>
-    <p class="tiny muted" style="margin-top:8px">Tu psicóloga recibirá un aviso, pero puede que no lo vea de inmediato. No reemplaza a las líneas de arriba.</p>
+    <button class="a-btn sec" onclick="sosNotify()">Avisar a mi profesional</button>
+    <p class="tiny muted" style="margin-top:8px">Tu profesional recibirá un aviso, pero puede que no lo vea de inmediato. No reemplaza a las líneas de arriba.</p>
     <button class="a-btn sec" style="background:none" onclick="S.app.sheet=null;render()">Cerrar</button>
   </div></div>`;
 }
-function sosNotify() { ME().sos = true; S.app.sheet = null; render(); toast("Le avisamos a Camila. Si es urgente, llama al *4141 o al 131."); }
+function sosNotify() { ME().sos = true; S.app.sheet = null; render(); toast(`Le avisamos a ${firstName(S.pro.name)}. Si es urgente, llama al *4141 o al 131.`); }
 
 /* ================= arranque ================= */
-document.querySelectorAll(".tabs button").forEach(b => b.onclick = () => go(b.dataset.view));
-$("#reset").onclick = () => { const v = S.view; S = seed(); S.view = v; render(); toast("Demo reiniciada."); };
 $("#logo").innerHTML = flower(5, 28);
-function fromHash() { const h = location.hash.slice(1); if (["presentacion","panel","app"].includes(h)) S.view = h; }
+applySession();
+const VIEWS = ["presentacion","panel","app","ingresar","registro"];
+function fromHash() { const h = location.hash.slice(1); if (VIEWS.includes(h)) S.view = h; }
 fromHash();
-window.addEventListener("hashchange", () => { fromHash(); render(); });
+window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (VIEWS.includes(h) && h !== S.view) { S.view = h; render(); } });
 render();
 </script>
 </body>
