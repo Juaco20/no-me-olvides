@@ -537,12 +537,6 @@ function vLogin() {
       </form>
       <div class="row tiny" style="justify-content:space-between;margin-top:14px"><a href="#" onclick="event.preventDefault();forgot()">¿Olvidaste tu contraseña?</a><a href="#registro" onclick="event.preventDefault();go('registro')">Crear cuenta</a></div>
     </div>
-    <div class="card demo-card">
-      <b>Cuentas de prueba</b>
-      <p class="tiny muted" style="margin:4px 0 10px">Para la presentación. Toca una y luego “Ingresar”.</p>
-      ${DEMO.map(u => `<button class="acct" onclick="fillDemo('${u.email}','${u.pass}')"><span class="av" style="width:34px;height:34px;font-size:12px;background:${u.role === "pro" ? "var(--green)" : "var(--blue)"}">${initials(u.name)}</span><span style="flex:1;text-align:left"><b style="font-size:14px">${esc(u.name)}</b><span class="tiny muted" style="display:block">${u.role === "pro" ? "Profesional" : "Paciente"} · ${esc(u.email)}</span></span><code>${esc(u.pass)}</code></button>`).join("")}
-      ${DEMO_NOTE}
-    </div>
   </div>`;
 }
 function fillDemo(e, p) { $("#li-email").value = e; $("#li-pass").value = p; $("#li-err").textContent = ""; }
