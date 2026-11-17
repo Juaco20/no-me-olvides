@@ -319,135 +319,268 @@ function seed() {
   };
 }
 
-/* ================= cuentas (demo, sin seguridad real) ================= */
-const KEY = "nmo-db-v1";
+/* ================= cuentas y datos: Firebase ================= */
+// Configuración pública de la app web de Firebase (no es secreta; el acceso lo controlan las reglas de Firestore).
+const FB_CONFIG = {apiKey: "AIzaSyAn8--LY1zqg9BaL2HK6aHNL7yBoMHW5Y8", authDomain: "no-me-olvides-4f16f.firebaseapp.com", projectId: "no-me-olvides-4f16f", storageBucket: "no-me-olvides-4f16f.firebasestorage.app", messagingSenderId: "561884940127", appId: "1:561884940127:web:2e8e5e4e6be6fd1f0c58ea"};
+const FB_V = "10.12.2";
 const COLORS = ["#5b7fc7","#c46a4f","#2f5d4b","#8a6bb5","#a5802a","#3f7461"];
 const dayNum = d => Math.floor((d.getTime() - d.getTimezoneOffset() * 60000) / 864e5);
+const TODAYN = dayNum(TODAY);
 const initials = n => String(n || "?").replace(/^(Ps\.|Dr\/a\.|T\.O\.)\s*/, "").split(/\s+/).filter(Boolean).slice(0, 2).map(x => x[0].toUpperCase()).join("");
 const firstName = n => String(n || "").replace(/^(Ps\.|Dr\/a\.|T\.O\.)\s*/, "").split(/\s+/)[0];
-const shortName = n => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[1][0].toUpperCase()}.` : p[0]; };
+const shortName = n => { const p = String(n || "").trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[1][0].toUpperCase()}.` : p[0]; };
 const DIAS_L = ["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
 const MESES_L = ["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
 const longDate = () => `${DIAS_L[TODAY.getDay()]} ${TODAY.getDate()} de ${MESES_L[TODAY.getMonth()]}`;
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
+const DEMO = [
+  {email: "camila@nomeolvides.demo", pass: "demo1234", name: "Camila Fuentes", role: "pro"},
+  {email: "martina@nomeolvides.demo", pass: "demo1234", name: "Martina Rojas", role: "pac"}
+];
 function defaultApp() {
   return {onboarded:false, step:1, consent:{checkins:true, actividades:true, reflexiones:false}, answers:[], profile:null, tab:"hoy", open:null, mood:null, emos:[], moodNote:"", checkedToday:false, sheet:null, journal:[], draft:"", draftShared:false, actText:"", actShared:true, actImg:null, joined:[]};
 }
-function seedDB() {
-  const s = seed();
-  s.pro.id = "pro-cf";
-  s.patients.forEach(p => { p.app = defaultApp(); });
-  const mart = s.patients.find(p => p.id === "p1");
-  mart.app = {...s.app, onboarded:true, step:3, profile:"Arte", answers:["Arte","mid","Ansiedad"]};
-  return {
-    v: 1, day: dayNum(TODAY), session: null,
-    users: [
-      {email:"camila@nomeolvides.demo", pass:"demo1234", role:"pro", proId:"pro-cf", name:"Camila Fuentes"},
-      {email:"martina@nomeolvides.demo", pass:"demo1234", role:"pac", proId:"pro-cf", patientId:"p1", name:"Martina Rojas"}
-    ],
-    pros: {"pro-cf": {pro: s.pro, patients: s.patients}}
-  };
-}
-let DB;
-try { const raw = localStorage.getItem(KEY); DB = raw ? JSON.parse(raw) : seedDB(); } catch (e) { DB = seedDB(); }
-(function shiftDays() {
-  const diff = dayNum(TODAY) - (DB.day || dayNum(TODAY));
-  if (diff <= 0) return;
-  Object.values(DB.pros).forEach(W => W.patients.forEach(p => {
-    p.mood = diff >= 14 ? Array(14).fill(null) : p.mood.slice(diff).concat(Array(diff).fill(null));
-    p.lastActive += diff;
-    p.done.forEach(d => d.date += diff); p.assigned.forEach(a => a.date += diff);
-    if (p.app) { p.app.checkedToday = false; p.app.mood = null; p.app.emos = []; p.app.moodNote = ""; (p.app.journal || []).forEach(j => j.date += diff); }
-  }));
-  DB.day = dayNum(TODAY);
-})();
-const S = {view:"presentacion", proTab:"resumen", proPatient:null, libFilter:"Todos", pro:null, patients:[], me:null, app:null, reg:null};
-function save() { try { if (S.app) S.app.actImg = null; localStorage.setItem(KEY, JSON.stringify(DB)); } catch (e) {} }
-const currentUser = () => DB.session ? DB.users.find(u => u.email === DB.session.email) || null : null;
-function applySession() {
-  const u = currentUser();
-  if (!u || !DB.pros[u.proId]) { DB.session = null; S.pro = null; S.patients = []; S.me = null; S.app = null; return; }
-  const W = DB.pros[u.proId]; S.pro = W.pro; S.patients = W.patients;
-  if (u.role === "pac") { S.me = u.patientId; S.app = P(S.me).app; } else { S.me = null; S.app = null; }
-}
-function loginAs(u, msg) { DB.session = {email: u.email}; applySession(); S.proTab = "resumen"; S.proPatient = null; closeModal(); go(u.role === "pro" ? "panel" : "app"); toast(msg || `Hola, ${firstName(u.name)}.`); }
-function logout() { DB.session = null; applySession(); go("presentacion"); toast("Cerraste sesión."); }
-function resetDemo() { DB = seedDB(); applySession(); go("ingresar"); toast("Datos de demo restablecidos."); }
-function makeCode(name) { let c; do { c = "NMO-" + (initials(name) || "XX") + String(Math.floor(10 + Math.random() * 90)); } while (Object.values(DB.pros).some(W => W.pro.code === c)); return c; }
 
+const S = {view:"presentacion", proTab:"resumen", proPatient:null, libFilter:"Todos", pro:null, patients:[], me:null, app:null, reg:null,
+  uid:null, user:null, authUser:null, loading:true, needsProfile:false, busy:false};
+let F = {}, auth = null, db = null, unsubs = [], notesMap = {};
+const lastSent = {};
+
+/* ---------- conversión local <-> Firestore (fechas absolutas en la nube) ---------- */
+const PRO_FIELDS = ["assigned", "next"];
+const PAC_FIELDS = ["name", "color", "obj", "since", "age", "emos", "sos", "lastDay", "mood", "done"];
+function toRemote(p) {
+  const mood = {};
+  p.mood.forEach((v, i) => { if (v != null) mood[String(TODAYN - 13 + i)] = v; });
+  return {name: p.name || "", color: p.color || "#5b7fc7", obj: p.obj || "Por definir", since: p.since || "", next: p.next || "Por agendar", age: p.age || "",
+    emos: p.emos || {}, sos: !!p.sos, lastDay: TODAYN - (p.lastActive ?? 0), mood,
+    done: (p.done || []).map(d => ({a: d.a, day: TODAYN - d.date, text: d.text || "", shared: !!d.shared, img: d.img || null})),
+    assigned: (p.assigned || []).map(x => ({a: x.a, note: x.note || "", day: TODAYN - x.date}))};
+}
+function fromRemote(id, r) {
+  const mood = Array(14).fill(null);
+  Object.entries(r.mood || {}).forEach(([k, v]) => { const i = Number(k) - (TODAYN - 13); if (i >= 0 && i < 14) mood[i] = v; });
+  return {id, name: r.name || "Paciente", color: r.color || "#5b7fc7", obj: r.obj || "Por definir", since: r.since || "", next: r.next || "Por agendar", age: r.age || "",
+    emos: r.emos || {}, sos: !!r.sos, lastActive: r.lastDay != null ? TODAYN - r.lastDay : 99, mood,
+    done: (r.done || []).map(d => ({a: d.a, date: TODAYN - d.day, text: d.text || "", shared: !!d.shared, img: d.img || null})),
+    assigned: (r.assigned || []).map(x => ({a: x.a, note: x.note || "", date: TODAYN - x.day})), notes: notesMap[id] || ""};
+}
+function toRemoteApp(a) {
+  const keep = {onboarded: a.onboarded, step: a.step, consent: a.consent, answers: a.answers, profile: a.profile, joined: a.joined,
+    journal: (a.journal || []).map(j => ({day: TODAYN - j.date, text: j.text, shared: !!j.shared})),
+    checkedDay: a.checkedToday ? TODAYN : null, mood: a.checkedToday ? a.mood : null, emos: a.checkedToday ? a.emos : []};
+  return JSON.parse(JSON.stringify(keep));
+}
+function fromRemoteApp(r) {
+  const a = defaultApp();
+  if (!r) return a;
+  Object.assign(a, {onboarded: !!r.onboarded, step: r.step || 1, consent: r.consent || a.consent, answers: r.answers || [], profile: r.profile || null, joined: r.joined || [],
+    journal: (r.journal || []).map(j => ({date: TODAYN - j.day, text: j.text, shared: !!j.shared}))});
+  if (r.checkedDay === TODAYN) { a.checkedToday = true; a.mood = r.mood; a.emos = r.emos || []; }
+  return a;
+}
+const pick = (o, ks) => ks.reduce((a, k) => (k in o ? (a[k] = o[k], a) : a), {});
+const stable = o => JSON.stringify(o, (k, v) => v && typeof v === "object" && !Array.isArray(v) ? Object.keys(v).sort().reduce((a, x) => (a[x] = v[x], a), {}) : v);
+function changed(k, obj) { const s = stable(obj); if (lastSent[k] === s) return false; lastSent[k] = s; return true; }
+const fieldsFor = id => S.user && S.user.role === "pro" ? (id.startsWith("demo-") ? PRO_FIELDS.concat(PAC_FIELDS) : PRO_FIELDS) : PAC_FIELDS;
+
+/* ---------- guardado (diferencial, solo los campos que le tocan a cada rol) ---------- */
+let flushT = null;
+function save() { if (!S.uid || !db || !S.user) return; clearTimeout(flushT); flushT = setTimeout(flush, 350); }
+async function flush() {
+  if (!S.uid || !db || !S.user) return;
+  try {
+    if (S.user.role === "pro") {
+      const pd = {name: S.pro.name, place: S.pro.place, plan: S.pro.plan};
+      if (changed("pro", pd)) await F.updateDoc(F.doc(db, "pros", S.uid), pd);
+      for (const p of S.patients) {
+        const part = pick(toRemote(p), fieldsFor(p.id));
+        if (changed("p:" + p.id, part)) await F.updateDoc(F.doc(db, "pros", S.uid, "patients", p.id), part);
+        if (changed("n:" + p.id, {text: p.notes || ""})) await F.setDoc(F.doc(db, "pros", S.uid, "notes", p.id), {text: p.notes || ""});
+      }
+    } else if (S.user.role === "pac" && ME()) {
+      const p = ME();
+      const part = pick(toRemote(p), PAC_FIELDS);
+      if (changed("p:" + p.id, part)) await F.updateDoc(F.doc(db, "pros", S.user.proId, "patients", p.id), part);
+      const ap = toRemoteApp(S.app);
+      if (changed("app", ap)) await F.setDoc(F.doc(db, "users", S.uid, "private", "app"), ap);
+    }
+  } catch (e) { console.error(e); Object.keys(lastSent).forEach(k => delete lastSent[k]); toast("No se pudo guardar. Revisa tu conexión e inténtalo de nuevo."); }
+}
+function liveRender() {
+  const a = document.activeElement;
+  if (a && /INPUT|TEXTAREA|SELECT/.test(a.tagName) && $("#main").contains(a)) { S.pendingRender = true; return; }
+  render();
+}
+document.addEventListener("focusout", () => { if (S.pendingRender) { S.pendingRender = false; setTimeout(render, 0); } });
+
+/* ---------- sesión ---------- */
+function stopListeners() { unsubs.forEach(u => { try { u(); } catch (e) {} }); unsubs = []; notesMap = {}; Object.keys(lastSent).forEach(k => delete lastSent[k]); }
+async function onAuth(user) {
+  stopListeners();
+  S.authUser = user; S.uid = user ? user.uid : null; S.user = null; S.pro = null; S.patients = []; S.me = null; S.app = null; S.needsProfile = false;
+  if (!user) { S.loading = false; render(); return; }
+  if (S.registering) return;
+  S.loading = true; render();
+  try {
+    const us = await F.getDoc(F.doc(db, "users", user.uid));
+    if (!us.exists()) { S.needsProfile = true; S.loading = false; S.view = "perfil"; render(); return; }
+    await loadSession(user.uid, us.data());
+  } catch (e) { console.error(e); S.loading = false; toast("No pudimos cargar tu cuenta. Revisa tu conexión."); render(); }
+}
+async function loadSession(uid, profile) {
+  S.user = profile; S.uid = uid;
+  if (profile.role === "pro") {
+    const ps = await F.getDoc(F.doc(db, "pros", uid));
+    S.pro = {id: uid, ...ps.data()};
+    changed("pro", {name: S.pro.name, place: S.pro.place, plan: S.pro.plan});
+    unsubs.push(F.onSnapshot(F.collection(db, "pros", uid, "notes"), snap => {
+      snap.docs.forEach(d => { notesMap[d.id] = d.data().text || ""; lastSent["n:" + d.id] = stable({text: notesMap[d.id]}); });
+      S.patients.forEach(p => { if (notesMap[p.id] != null) p.notes = notesMap[p.id]; });
+      liveRender();
+    }, e => console.error(e)));
+    unsubs.push(F.onSnapshot(F.collection(db, "pros", uid, "patients"), snap => {
+      const list = snap.docs.map(d => fromRemote(d.id, d.data()));
+      list.sort((a, b) => (a.id.startsWith("demo-") - b.id.startsWith("demo-")) || a.name.localeCompare(b.name));
+      list.forEach(p => { lastSent["p:" + p.id] = stable(pick(toRemote(p), fieldsFor(p.id))); lastSent["n:" + p.id] = stable({text: p.notes || ""}); });
+      S.patients = list; S.loading = false; liveRender();
+    }, e => { console.error(e); S.loading = false; render(); }));
+  } else {
+    const ps = await F.getDoc(F.doc(db, "pros", profile.proId));
+    S.pro = {id: profile.proId, ...ps.data()};
+    const ap = await F.getDoc(F.doc(db, "users", uid, "private", "app"));
+    S.app = fromRemoteApp(ap.exists() ? ap.data() : null);
+    lastSent["app"] = stable(toRemoteApp(S.app));
+    S.me = uid;
+    unsubs.push(F.onSnapshot(F.doc(db, "pros", profile.proId, "patients", uid), snap => {
+      if (!snap.exists()) return;
+      const p = fromRemote(uid, snap.data());
+      lastSent["p:" + uid] = stable(pick(toRemote(p), PAC_FIELDS));
+      S.patients = [p]; S.loading = false; liveRender();
+    }, e => { console.error(e); S.loading = false; render(); }));
+  }
+  if (["ingresar", "registro", "perfil", "presentacion"].includes(S.view) || !S.view) S.view = profile.role === "pro" ? "panel" : "app";
+  render();
+}
+async function logout() { try { await F.signOut(auth); } catch (e) {} S.view = "presentacion"; toast("Cerraste sesión."); }
+
+/* ---------- registro ---------- */
+async function uniqueCode(name) {
+  for (let i = 0; i < 20; i++) {
+    const c = "NMO-" + (initials(name) || "XX") + String(Math.floor(10 + Math.random() * 90));
+    const ex = await F.getDoc(F.doc(db, "codes", c));
+    if (!ex.exists()) return c;
+  }
+  return "NMO-" + Date.now().toString(36).toUpperCase().slice(-5);
+}
+async function createProfile(uid, d) {
+  if (d.role === "pro") {
+    const code = await uniqueCode(d.name);
+    await F.setDoc(F.doc(db, "pros", uid), {name: (d.prof ? d.prof + " " : "") + d.name, place: (d.prof ? "Consulta particular" : "Centro de salud") + (d.city ? " · " + d.city : ""), code, plan: "gratis", createdDay: TODAYN});
+    await F.setDoc(F.doc(db, "codes", code), {proId: uid});
+    const profile = {role: "pro", name: d.name, email: d.email};
+    await F.setDoc(F.doc(db, "users", uid), profile);
+    return {profile, msg: `Cuenta creada. Tu código para invitar pacientes es ${code}.`};
+  } else {
+    const p = {id: uid, name: shortName(d.name), age: "", color: COLORS[Math.floor(Math.random() * COLORS.length)], obj: "Por definir", since: `${MESES[TODAY.getMonth()]} ${TODAY.getFullYear()}`, next: "Por agendar", mood: Array(14).fill(null), emos: {}, assigned: [], done: [], notes: "", lastActive: 0, sos: false};
+    await F.setDoc(F.doc(db, "pros", d.proId, "patients", uid), toRemote(p));
+    const profile = {role: "pac", name: d.name, email: d.email, proId: d.proId};
+    await F.setDoc(F.doc(db, "users", uid), profile);
+    await F.setDoc(F.doc(db, "users", uid, "private", "app"), toRemoteApp(defaultApp()));
+    return {profile, msg: `Cuenta creada y vinculada a ${d.proName}.`};
+  }
+}
+async function findCode(code) {
+  const c = await F.getDoc(F.doc(db, "codes", code));
+  if (!c.exists()) return null;
+  const pro = await F.getDoc(F.doc(db, "pros", c.data().proId)).catch(() => null);
+  return {proId: c.data().proId, proName: pro && pro.exists() ? pro.data().name : "tu profesional"};
+}
+function fbErr(e) {
+  const c = (e && e.code) || "";
+  return ({
+    "auth/invalid-credential": "Correo o contraseña incorrectos.", "auth/wrong-password": "Correo o contraseña incorrectos.", "auth/user-not-found": "Correo o contraseña incorrectos.",
+    "auth/invalid-email": "El correo no es válido.", "auth/email-already-in-use": "Ya existe una cuenta con ese correo.", "auth/weak-password": "La contraseña debe tener al menos 6 caracteres.",
+    "auth/too-many-requests": "Demasiados intentos. Espera unos minutos.", "auth/network-request-failed": "Sin conexión. Revisa tu internet.",
+    "auth/popup-blocked": "El navegador bloqueó la ventana de Google. Permite ventanas emergentes e inténtalo otra vez.",
+    "auth/unauthorized-domain": "Este dominio aún no está autorizado para ingresar con Google."
+  })[c] || "Algo salió mal. Inténtalo de nuevo.";
+}
+function setBusy(b, sel) { S.busy = b; document.querySelectorAll(sel || "#main button").forEach(x => x.disabled = b); }
+
+/* ---------- vistas de acceso ---------- */
 function renderNav() {
-  const u = currentUser();
+  const u = S.user;
   const tabs = [["presentacion","Presentación"]];
   if (u && u.role === "pro") tabs.push(["panel","Mi panel"]);
   if (u && u.role === "pac") tabs.push(["app","Mi espacio"]);
   $("#nav").innerHTML = `<div class="tabs">${tabs.map(([k, l]) => `<button class="${S.view === k ? "on" : ""}" onclick="go('${k}')">${l}</button>`).join("")}</div>` +
     (u ? `<div class="user"><span class="av" style="width:32px;height:32px;font-size:12px;background:var(--green)">${initials(u.name)}</span><span class="uname">${esc(u.name)}<small>${u.role === "pro" ? "Profesional" : "Paciente"}</small></span><button class="reset" onclick="logout()">Cerrar sesión</button></div>`
-       : `<button class="reset" onclick="go('ingresar')">Ingresar</button><button class="btn sm" onclick="go('registro')">Crear cuenta</button>`);
+     : S.authUser ? `<button class="reset" onclick="logout()">Cerrar sesión</button>`
+     : `<button class="reset" onclick="go('ingresar')">Ingresar</button><button class="btn sm" onclick="go('registro')">Crear cuenta</button>`);
 }
-const DEMO_NOTE = `<div class="demo-warn"><b>Versión demo.</b> Las cuentas se guardan solo en este navegador y no tienen seguridad real. No uses una contraseña que ocupes en otros sitios.</div>`;
+const DEMO_NOTE = `<div class="demo-warn"><b>Beta académica.</b> Usa solo datos de prueba: no ingreses información real de pacientes.</div>`;
+const GBTN = label => `<button class="gbtn" type="button" onclick="googleLogin()"><span class="gdot">G</span>${label}</button>`;
+function loadingView() { return `<div class="auth"><div class="card auth-card" style="text-align:center">${flower(4, 56)}<p class="muted">Cargando…</p></div></div>`; }
 function vLogin() {
-  const demos = DB.users.filter(u => u.email.endsWith(".demo"));
   return `<div class="auth">
     <div class="card auth-card">
       <div style="text-align:center">${flower(5, 56)}<h2 style="font-size:26px;margin-top:4px">Ingresar</h2><p class="muted tiny" style="margin:4px 0 0">Para profesionales, centros y pacientes.</p></div>
-      <button class="gbtn" type="button" onclick="googleModal()"><span class="gdot">G</span>Continuar con Google</button>
+      ${GBTN("Continuar con Google")}
       <div class="or"><span>o con tu correo</span></div>
       <form onsubmit="event.preventDefault();doLogin()">
-        <label>Correo</label><input class="field" id="li-email" type="email" required autocomplete="off" placeholder="tu@correo.cl">
-        <label>Contraseña</label><input class="field" id="li-pass" type="password" required autocomplete="off" placeholder="••••••••">
+        <label>Correo</label><input class="field" id="li-email" type="email" required autocomplete="username" placeholder="tu@correo.cl">
+        <label>Contraseña</label><input class="field" id="li-pass" type="password" required autocomplete="current-password" placeholder="••••••••">
         <div id="li-err" class="err"></div>
         <button class="btn" style="width:100%" type="submit">Ingresar</button>
       </form>
-      <div class="row tiny" style="justify-content:space-between;margin-top:14px"><a href="#" onclick="event.preventDefault();forgotModal()">¿Olvidaste tu contraseña?</a><a href="#registro" onclick="event.preventDefault();go('registro')">Crear cuenta</a></div>
+      <div class="row tiny" style="justify-content:space-between;margin-top:14px"><a href="#" onclick="event.preventDefault();forgot()">¿Olvidaste tu contraseña?</a><a href="#registro" onclick="event.preventDefault();go('registro')">Crear cuenta</a></div>
     </div>
     <div class="card demo-card">
       <b>Cuentas de prueba</b>
-      <p class="tiny muted" style="margin:4px 0 10px">Toca una para completar los datos y luego “Ingresar”.</p>
-      ${demos.map(u => `<button class="acct" onclick="fillDemo('${u.email}','${u.pass}')"><span class="av" style="width:34px;height:34px;font-size:12px;background:${u.role === "pro" ? "var(--green)" : "var(--blue)"}">${initials(u.name)}</span><span style="flex:1;text-align:left"><b style="font-size:14px">${esc(u.name)}</b><span class="tiny muted" style="display:block">${u.role === "pro" ? "Profesional" : "Paciente"} · ${esc(u.email)}</span></span><code>${esc(u.pass)}</code></button>`).join("")}
+      <p class="tiny muted" style="margin:4px 0 10px">Para la presentación. Toca una y luego “Ingresar”.</p>
+      ${DEMO.map(u => `<button class="acct" onclick="fillDemo('${u.email}','${u.pass}')"><span class="av" style="width:34px;height:34px;font-size:12px;background:${u.role === "pro" ? "var(--green)" : "var(--blue)"}">${initials(u.name)}</span><span style="flex:1;text-align:left"><b style="font-size:14px">${esc(u.name)}</b><span class="tiny muted" style="display:block">${u.role === "pro" ? "Profesional" : "Paciente"} · ${esc(u.email)}</span></span><code>${esc(u.pass)}</code></button>`).join("")}
       ${DEMO_NOTE}
-      <button class="reset" style="margin-top:12px" onclick="resetDemo()">Restablecer datos de demo</button>
     </div>
   </div>`;
 }
 function fillDemo(e, p) { $("#li-email").value = e; $("#li-pass").value = p; $("#li-err").textContent = ""; }
-function doLogin() {
-  const e = $("#li-email").value.trim().toLowerCase(), p = $("#li-pass").value;
-  const u = DB.users.find(x => x.email === e);
-  if (!u || u.pass !== p) { $("#li-err").textContent = "Correo o contraseña incorrectos."; return; }
-  loginAs(u);
+async function doLogin() {
+  const e = $("#li-email").value.trim(), p = $("#li-pass").value;
+  setBusy(true);
+  try { await F.signInWithEmailAndPassword(auth, e, p); }
+  catch (err) { setBusy(false); $("#li-err").textContent = fbErr(err); }
 }
-function googleModal() {
-  $("#modal-root").innerHTML = `<div class="modal" onclick="if(event.target===this)closeModal()"><div class="in" style="max-width:440px">
-    <span class="pill" style="background:var(--rose2);color:#8a4632">Simulación</span>
-    <h3 style="font-size:21px;margin-top:10px">Elige una cuenta</h3>
-    <p class="tiny muted">En la versión real aquí se abriría Google para confirmar tu identidad. En la demo puedes entrar con cualquier cuenta creada en este navegador.</p>
-    ${DB.users.map((u, i) => `<button class="acct" onclick="loginAs(DB.users[${i}])"><span class="av" style="width:34px;height:34px;font-size:12px;background:${u.role === "pro" ? "var(--green)" : "var(--blue)"}">${initials(u.name)}</span><span style="flex:1;text-align:left"><b style="font-size:14px">${esc(u.name)}</b><span class="tiny muted" style="display:block">${esc(u.email)}</span></span></button>`).join("")}
-    <div class="row" style="margin-top:14px;justify-content:space-between"><button class="btn ghost sm" onclick="closeModal();go('registro')">Crear una cuenta nueva</button><button class="reset" onclick="closeModal()">Cancelar</button></div>
-  </div></div>`;
+async function googleLogin() {
+  try { await F.signInWithPopup(auth, new F.GoogleAuthProvider()); }
+  catch (err) { if (err.code !== "auth/popup-closed-by-user" && err.code !== "auth/cancelled-popup-request") toast(fbErr(err)); }
 }
-function forgotModal() {
-  $("#modal-root").innerHTML = `<div class="modal" onclick="if(event.target===this)closeModal()"><div class="in" style="max-width:420px">
-    <h3 style="font-size:21px">Recuperar contraseña</h3>
-    <p class="muted" style="font-size:14px">En la versión real te enviaríamos un correo para crear una nueva. En esta demo no se envían correos.</p>
-    <p class="tiny muted">Las cuentas de prueba usan la contraseña <code>demo1234</code>. Si creaste una cuenta y no recuerdas la clave, crea otra con un correo distinto.</p>
-    <button class="btn sm" onclick="closeModal()">Entendido</button></div></div>`;
+async function forgot() {
+  const e = ($("#li-email") || {}).value?.trim();
+  if (!e) { $("#li-err").textContent = "Escribe tu correo arriba y vuelve a tocar “¿Olvidaste tu contraseña?”."; return; }
+  try { await F.sendPasswordResetEmail(auth, e); toast("Si el correo existe, te enviamos un enlace para crear una nueva contraseña."); }
+  catch (err) { $("#li-err").textContent = fbErr(err); }
 }
+function roleFields(r, prefix) {
+  return r.role === "pro" ? `
+        <label>Profesión</label><select class="field" id="${prefix}-prof"><option value="Ps.">Psicólogo/a</option><option value="Dr/a.">Psiquiatra</option><option value="T.O.">Terapeuta ocupacional</option><option value="">Clínica o centro de salud</option></select>
+        <label>Ciudad</label><input class="field" id="${prefix}-city" placeholder="Ej: Viña del Mar" autocomplete="off">` : `
+        <label>Código de tu profesional</label><input class="field" id="${prefix}-code" required placeholder="Ej: NMO-CF24" style="text-transform:uppercase" autocomplete="off">
+        <div class="tiny muted" style="margin:-6px 0 10px">Te lo entrega tu psicólogo/a o tu centro de salud.</div>`;
+}
+function roleSeg(r) { return `<div class="seg" style="margin:16px 0 4px"><button type="button" class="${r.role === "pro" ? "on" : ""}" onclick="S.reg.role='pro';render()">Soy profesional o centro</button><button type="button" class="${r.role === "pac" ? "on" : ""}" onclick="S.reg.role='pac';render()">Soy paciente</button></div>`; }
 function vRegistro() {
   const r = S.reg || (S.reg = {role: "pro"});
   return `<div class="auth">
     <div class="card auth-card" style="max-width:480px">
       <div style="text-align:center"><h2 style="font-size:26px">Crear cuenta</h2><p class="muted tiny" style="margin:4px 0 0">Elige cómo vas a usar No Me Olvides.</p></div>
-      <div class="seg" style="margin:16px 0 4px"><button type="button" class="${r.role === "pro" ? "on" : ""}" onclick="S.reg.role='pro';render()">Soy profesional o centro</button><button type="button" class="${r.role === "pac" ? "on" : ""}" onclick="S.reg.role='pac';render()">Soy paciente</button></div>
-      <button class="gbtn" type="button" onclick="googleSignup()"><span class="gdot">G</span>Registrarme con Google</button>
+      ${roleSeg(r)}
+      ${GBTN("Registrarme con Google")}
       <div class="or"><span>o con tu correo</span></div>
       <form onsubmit="event.preventDefault();doRegister()">
-        <label>Nombre y apellido</label><input class="field" id="rg-name" required autocomplete="off">
-        ${r.role === "pro" ? `
-        <label>Profesión</label><select class="field" id="rg-prof"><option value="Ps.">Psicólogo/a</option><option value="Dr/a.">Psiquiatra</option><option value="T.O.">Terapeuta ocupacional</option><option value="">Clínica o centro de salud</option></select>
-        <label>Ciudad</label><input class="field" id="rg-city" placeholder="Ej: Viña del Mar" autocomplete="off">` : `
-        <label>Código de tu profesional</label><input class="field" id="rg-code" required placeholder="Ej: NMO-CF24" style="text-transform:uppercase" autocomplete="off">
-        <div class="tiny muted" style="margin:-6px 0 10px">Te lo entrega tu psicólogo/a o tu centro de salud.</div>`}
-        <label>Correo</label><input class="field" id="rg-email" type="email" required autocomplete="off">
+        <label>Nombre y apellido</label><input class="field" id="rg-name" required autocomplete="name">
+        ${roleFields(r, "rg")}
+        <label>Correo</label><input class="field" id="rg-email" type="email" required autocomplete="email">
         <label>Contraseña</label><input class="field" id="rg-pass" type="password" minlength="6" required placeholder="Mínimo 6 caracteres" autocomplete="new-password">
         <div id="rg-err" class="err"></div>
         <button class="btn" style="width:100%" type="submit">Crear cuenta</button>
@@ -457,31 +590,72 @@ function vRegistro() {
     </div>
   </div>`;
 }
-function googleSignup() {
-  $("#modal-root").innerHTML = `<div class="modal" onclick="if(event.target===this)closeModal()"><div class="in" style="max-width:420px">
-    <span class="pill" style="background:var(--rose2);color:#8a4632">Simulación</span>
-    <h3 style="font-size:21px;margin-top:10px">Registro con Google</h3>
-    <p class="muted" style="font-size:14px">En la versión real, Google completaría tu nombre y correo automáticamente. En la demo, complétalos en el formulario.</p>
-    <button class="btn sm" onclick="closeModal();document.getElementById('rg-name').focus()">Ir al formulario</button></div></div>`;
+function vPerfil() {
+  const r = S.reg || (S.reg = {role: "pro"});
+  const a = S.authUser || {};
+  return `<div class="auth">
+    <div class="card auth-card" style="max-width:480px">
+      <div style="text-align:center"><h2 style="font-size:26px">Completa tu perfil</h2><p class="muted tiny" style="margin:4px 0 0">Entraste como ${esc(a.email || "")}. Falta un paso.</p></div>
+      ${roleSeg(r)}
+      <form onsubmit="event.preventDefault();doCompleteProfile()">
+        <label>Nombre y apellido</label><input class="field" id="pf-name" required value="${esc(a.displayName || "")}" autocomplete="name">
+        ${roleFields(r, "pf")}
+        <div id="pf-err" class="err"></div>
+        <button class="btn" style="width:100%" type="submit">Continuar</button>
+      </form>
+      <p class="tiny muted" style="text-align:center;margin-top:12px"><a href="#" onclick="event.preventDefault();logout()">Usar otra cuenta</a></p>
+    </div>
+  </div>`;
 }
-function doRegister() {
-  const role = S.reg.role, name = $("#rg-name").value.trim(), email = $("#rg-email").value.trim().toLowerCase(), pass = $("#rg-pass").value, err = $("#rg-err");
-  if (DB.users.some(u => u.email === email)) { err.textContent = "Ya existe una cuenta con ese correo."; return; }
-  if (role === "pro") {
-    const prof = $("#rg-prof").value, city = $("#rg-city").value.trim();
-    const id = "pro-" + Date.now().toString(36), code = makeCode(name);
-    DB.pros[id] = {pro: {id, name: (prof ? prof + " " : "") + name, place: (prof ? "Consulta particular" : "Centro de salud") + (city ? " · " + city : ""), code, plan: "gratis"}, patients: []};
-    const u = {email, pass, role: "pro", proId: id, name};
-    DB.users.push(u); S.reg = null; loginAs(u, `Cuenta creada. Tu código para invitar pacientes es ${code}.`);
-  } else {
-    const code = $("#rg-code").value.trim().toUpperCase();
-    const proId = Object.keys(DB.pros).find(k => DB.pros[k].pro.code === code);
-    if (!proId) { err.textContent = "No encontramos ese código. Revísalo con tu profesional."; return; }
-    const W = DB.pros[proId], pid = "p-" + Date.now().toString(36);
-    W.patients.push({id: pid, name: shortName(name), age: "", color: COLORS[W.patients.length % COLORS.length], obj: "Por definir", since: `${MESES[TODAY.getMonth()]} ${TODAY.getFullYear()}`, next: "Por agendar", mood: Array(14).fill(null), emos: {}, assigned: [], done: [], notes: "", lastActive: 0, sos: false, app: defaultApp()});
-    const u = {email, pass, role: "pac", proId, patientId: pid, name};
-    DB.users.push(u); S.reg = null; loginAs(u, `Cuenta creada y vinculada a ${W.pro.name}.`);
+async function collectRole(prefix, errEl) {
+  const d = {role: S.reg.role, name: $(`#${prefix}-name`).value.trim()};
+  if (d.role === "pro") { d.prof = $(`#${prefix}-prof`).value; d.city = $(`#${prefix}-city`).value.trim(); }
+  else {
+    const code = $(`#${prefix}-code`).value.trim().toUpperCase();
+    const found = await findCode(code);
+    if (!found) { errEl.textContent = "No encontramos ese código. Revísalo con tu profesional."; return null; }
+    Object.assign(d, found);
   }
+  return d;
+}
+async function doRegister() {
+  const err = $("#rg-err"); err.textContent = ""; setBusy(true);
+  try {
+    const d = await collectRole("rg", err);
+    if (!d) { setBusy(false); return; }
+    d.email = $("#rg-email").value.trim();
+    S.registering = true;
+    const cred = await F.createUserWithEmailAndPassword(auth, d.email, $("#rg-pass").value);
+    const {profile, msg} = await createProfile(cred.user.uid, d);
+    S.registering = false; S.reg = null; S.authUser = cred.user;
+    await loadSession(cred.user.uid, profile); toast(msg);
+  } catch (e) { console.error(e); S.registering = false; setBusy(false); err.textContent = fbErr(e); }
+}
+async function doCompleteProfile() {
+  const err = $("#pf-err"); err.textContent = ""; setBusy(true);
+  try {
+    const d = await collectRole("pf", err);
+    if (!d) { setBusy(false); return; }
+    d.email = S.authUser.email || "";
+    const {profile, msg} = await createProfile(S.authUser.uid, d);
+    S.needsProfile = false; S.reg = null;
+    await loadSession(S.authUser.uid, profile); toast(msg);
+  } catch (e) { console.error(e); setBusy(false); err.textContent = fbErr(e); }
+}
+
+/* ---------- datos de ejemplo para presentar ---------- */
+async function loadDemoPatients() {
+  const ex = seed().patients.filter(p => p.id !== "p1");
+  try {
+    for (const p of ex) await F.setDoc(F.doc(db, "pros", S.uid, "patients", "demo-" + p.id), toRemote(p));
+    toast("Cargamos 5 pacientes de ejemplo.");
+  } catch (e) { console.error(e); toast("No se pudieron cargar los ejemplos."); }
+}
+async function removeDemoPatients() {
+  try {
+    for (const p of S.patients.filter(p => p.id.startsWith("demo-"))) await F.deleteDoc(F.doc(db, "pros", S.uid, "patients", p.id));
+    toast("Quitamos los pacientes de ejemplo.");
+  } catch (e) { console.error(e); toast("No se pudieron quitar los ejemplos."); }
 }
 
 const P = id => S.patients.find(p => p.id === id);
@@ -540,13 +714,18 @@ function spark(p) {
 
 /* ================= vistas ================= */
 function render() {
-  const u = currentUser();
+  const u = S.user;
+  if (S.needsProfile) S.view = "perfil";
+  else if (S.view === "perfil") S.view = u ? (u.role === "pro" ? "panel" : "app") : "ingresar";
+  renderNav();
+  const m = $("#main");
+  if (S.loading && (S.view === "panel" || S.view === "app" || S.authUser && !u && !S.needsProfile)) { m.innerHTML = loadingView(); return; }
   if (S.view === "panel" && !(u && u.role === "pro")) S.view = u ? "app" : "ingresar";
   if (S.view === "app" && !(u && u.role === "pac")) S.view = u ? "panel" : "ingresar";
   if ((S.view === "ingresar" || S.view === "registro") && u) S.view = u.role === "pro" ? "panel" : "app";
+  if (S.view === "app" && !ME()) { m.innerHTML = loadingView(); return; }
   renderNav();
-  const m = $("#main");
-  m.innerHTML = S.view === "presentacion" ? vPresentacion() : S.view === "panel" ? vPanel() : S.view === "app" ? vApp() : S.view === "registro" ? vRegistro() : vLogin();
+  m.innerHTML = S.view === "presentacion" ? vPresentacion() : S.view === "panel" ? vPanel() : S.view === "app" ? vApp() : S.view === "registro" ? vRegistro() : S.view === "perfil" ? vPerfil() : vLogin();
   if (location.hash.slice(1) !== S.view) history.replaceState(null, "", "#" + S.view);
   save();
 }
@@ -679,7 +858,9 @@ function vPanel() {
         ${S.patients.length > pl.cupo ? `<div class="tiny" style="margin-top:8px">${S.patients.length - pl.cupo} pacientes esperando cupo</div>` : ""}
         <button class="btn sm" style="width:100%;margin-top:10px" onclick="upgradeModal()">Mejorar a Pro</button>` : `<div class="tiny muted" style="margin-top:4px">${S.patients.length} pacientes activos</div>`}
       </div>
-      <div class="demo-sw"><div class="tiny muted" style="margin-bottom:6px">Modo presentación: ver como</div><div class="seg">${Object.entries(PLANS).map(([k, v]) => `<button class="${S.pro.plan === k ? "on" : ""}" onclick="S.pro.plan='${k}';if(S.proTab==='equipo'&&'${k}'!=='centro')S.proTab='resumen';render()">${v.n}</button>`).join("")}</div></div>
+      <div class="demo-sw"><div class="tiny muted" style="margin-bottom:6px">Modo presentación</div>
+        ${S.patients.some(p => p.id.startsWith("demo-")) ? `<button class="reset" style="width:100%;margin-bottom:8px" onclick="removeDemoPatients()">Quitar pacientes de ejemplo</button>` : `<button class="reset" style="width:100%;margin-bottom:8px" onclick="loadDemoPatients()">Cargar pacientes de ejemplo</button>`}
+        <div class="tiny muted" style="margin-bottom:6px">Ver plan como</div><div class="seg">${Object.entries(PLANS).map(([k, v]) => `<button class="${S.pro.plan === k ? "on" : ""}" onclick="S.pro.plan='${k}';if(S.proTab==='equipo'&&'${k}'!=='centro')S.proTab='resumen';render()">${v.n}</button>`).join("")}</div></div>
     </aside>
     <section>${body}</section>
   </div>`;
@@ -721,7 +902,7 @@ function proResumen(allSignals) {
   </div>`;
 }
 function tablaPacientes() {
-  if (!S.patients.length) return `<div class="signal muted" style="padding:18px">Aún no tienes pacientes. Comparte tu código <b>${S.pro.code}</b> desde <a href="#" onclick="event.preventDefault();proGo('invitar')">Invitar pacientes</a>.</div>`;
+  if (!S.patients.length) return `<div class="signal muted" style="padding:18px">Aún no tienes pacientes. Comparte tu código <b>${S.pro.code}</b> desde <a href="#" onclick="event.preventDefault();proGo('invitar')">Invitar pacientes</a>, o carga pacientes de ejemplo desde el menú lateral.</div>`;
   return `<table><thead><tr><th>Paciente</th><th>Ánimo 14 días</th><th>Adherencia</th><th>Últ. actividad</th></tr></thead><tbody>
   ${S.patients.map(p => { const ad = adherence(p); const lk = patLocked(p); return `<tr class="click ${lk ? "locked" : ""}" onclick="openPatient('${p.id}')">
     <td><div class="row"><div class="av" style="background:${lk ? "#bdb6a8" : p.color};width:32px;height:32px;font-size:12px">${p.name.split(" ").map(x => x[0]).join("")}</div><div><b>${esc(p.name)}</b><div class="tiny muted">${lk ? "Esperando cupo" : esc(p.obj)}</div></div></div></td>
@@ -954,7 +1135,7 @@ function appActividad(x) {
 function pickImg(inp) {
   const f = inp.files && inp.files[0]; if (!f) return;
   const r = new FileReader();
-  r.onload = () => { const img = new Image(); img.onload = () => { const c = document.createElement("canvas"); const k = Math.min(1, 480 / img.width); c.width = img.width * k; c.height = img.height * k; c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); S.app.actImg = c.toDataURL("image/jpeg", .8); render(); }; img.src = r.result; };
+  r.onload = () => { const img = new Image(); img.onload = () => { const c = document.createElement("canvas"); const k = Math.min(1, 360 / img.width); c.width = img.width * k; c.height = img.height * k; c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); S.app.actImg = c.toDataURL("image/jpeg", .7); render(); }; img.src = r.result; };
   r.readAsDataURL(f);
 }
 function finishAct(id) {
@@ -1021,12 +1202,21 @@ function sosNotify() { ME().sos = true; S.app.sheet = null; render(); toast(`Le 
 
 /* ================= arranque ================= */
 $("#logo").innerHTML = flower(5, 28);
-applySession();
-const VIEWS = ["presentacion","panel","app","ingresar","registro"];
+const VIEWS = ["presentacion","panel","app","ingresar","registro","perfil"];
 function fromHash() { const h = location.hash.slice(1); if (VIEWS.includes(h)) S.view = h; }
 fromHash();
 window.addEventListener("hashchange", () => { const h = location.hash.slice(1); if (VIEWS.includes(h) && h !== S.view) { S.view = h; render(); } });
 render();
+(async function boot() {
+  try {
+    const base = `https://www.gstatic.com/firebasejs/${FB_V}/`;
+    const [appM, authM, fsM] = await Promise.all([import(base + "firebase-app.js"), import(base + "firebase-auth.js"), import(base + "firebase-firestore.js")]);
+    F = {...authM, ...fsM};
+    const app = appM.initializeApp(FB_CONFIG);
+    auth = F.getAuth(app); db = F.getFirestore(app);
+    F.onAuthStateChanged(auth, onAuth);
+  } catch (e) { console.error(e); S.loading = false; render(); toast("No se pudo conectar con el servidor."); }
+})();
 </script>
 </body>
 </html>
