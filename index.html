@@ -112,6 +112,31 @@ tr.click:hover td{background:#faf6ee}
 textarea.notes{width:100%;min-height:90px;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;resize:vertical}
 
 /* ---------- APP PACIENTE ---------- */
+.pac-onb{max-width:500px;margin:8px auto;padding:18px 22px 24px}
+.pac-onb .scr,.pac-main .scr{overflow:visible;padding:0;flex:none}
+.pac-main{min-width:0}
+.pac-card{padding:22px 28px 28px}
+.pac-mhead{display:none;margin:0 2px 10px}
+.pac-mhead a{color:var(--green);font-weight:700}
+.pac-nav svg{width:20px;height:20px;flex:none}
+.sos-side{width:100%;margin-top:12px;border:0;border-radius:99px;background:var(--danger);color:#fff;font-weight:700;padding:10px;cursor:pointer}
+.tabbar.pac-tabbar,.sos.pac-sos{display:none}
+.pac .moods{justify-content:flex-start;gap:14px;flex-wrap:wrap}
+.pac .moods button{width:76px}
+.sheet{position:fixed;inset:0;z-index:70;align-items:center;justify-content:center;padding:16px}
+.sheet .in{max-width:480px;border-radius:24px;max-height:90vh}
+@media (max-width:860px){
+  .pac .side{display:none}
+  .pac-mhead{display:block}
+  .pac-card{padding:16px 16px 22px;border-radius:20px}
+  .pac-main{padding-bottom:84px}
+  .pac .moods{justify-content:space-between;gap:0}
+  .pac .moods button{width:auto;flex:1;max-width:76px}
+  .tabbar.pac-tabbar{display:grid;position:fixed;left:0;right:0;bottom:0;z-index:40;padding:6px 4px calc(8px + env(safe-area-inset-bottom));box-shadow:0 -6px 18px rgba(59,38,38,.08)}
+  .sos.pac-sos{display:block;position:fixed;right:14px;bottom:calc(74px + env(safe-area-inset-bottom));z-index:41}
+  .sheet{align-items:flex-end;padding:0}
+  .sheet .in{max-width:none;border-radius:26px 26px 0 0}
+}
 .app-stage{display:grid;grid-template-columns:1fr 400px 1fr;gap:28px;align-items:start}
 .app-side{padding-top:30px}
 .app-side h2{font-size:26px;margin-bottom:8px}
@@ -1409,29 +1434,35 @@ function copyInv() { const v = $("#inv-msg").value; try { navigator.clipboard.wr
 
 /* ---------- App paciente ---------- */
 function vApp() {
-  const me = ME(), c = S.app.consent;
-  return `<div class="app-stage">
-    <div class="app-side">
-      <span class="pill">Mi espacio</span>
-      <h2 style="margin-top:10px">Hola, ${esc(firstName(me.name))}</h2>
-      <p class="muted">Tu cuenta está vinculada a <b>${esc(S.pro.name)}</b>. Solo ve lo que tú autorizas.</p>
-      ${S.app.onboarded ? `<div class="card" style="padding:16px;margin-top:14px">
-        <b style="font-size:14px">Lo que compartes</b>
-        <ul class="tiny" style="padding-left:18px;font-size:13.5px;margin:8px 0 10px">
-          <li>Cómo está tu flor: <b>${c.checkins ? "sí" : "no"}</b></li>
-          <li>Actividades completadas: <b>${c.actividades ? "sí" : "no"}</b></li>
-          <li>Reflexiones: <b>solo las que marques</b></li>
-        </ul>
-        <button class="btn ghost sm" onclick="S.app.onboarded=false;S.app.step=1;render()">Cambiar permisos</button>
-      </div>` : ""}
-    </div>
-    <div class="phone"><div class="screen">
-      <div class="status"><span>${String(new Date().getHours()).padStart(2, "0")}:${String(new Date().getMinutes()).padStart(2, "0")}</span><span>●●● ▲ ▮</span></div>
-      ${S.app.onboarded ? appMain() : appOnboarding()}
-    </div></div>
-    <div class="app-side"></div>
-  </div>`;
+  const me = ME(), a = S.app, c = a.consent;
+  if (!a.onboarded) return `<div class="card pac-onb">${appOnboarding()}</div>`;
+  const tabs = [["hoy","Hoy"],["rutas","Rutas"],["diario","Diario"],["comunidad","Comunidad"]];
+  const inner = a.open ? appActividad(lib(a.open)) : a.tab === "hoy" ? appHoy() : a.tab === "rutas" ? appRutas() : a.tab === "diario" ? appDiario() : appComunidad();
+  const tabBtn = ([k, l]) => `<button class="${a.tab === k && !a.open ? "on" : ""}" onclick="pacTab('${k}')">${ICONS[k]}<span>${l}</span></button>`;
+  const share = `<b style="font-size:13px">Lo que compartes</b>
+    <ul class="tiny" style="padding-left:18px;margin:6px 0 8px;line-height:1.6">
+      <li>Cómo está tu flor: <b>${c.checkins ? "sí" : "no"}</b></li>
+      <li>Actividades completadas: <b>${c.actividades ? "sí" : "no"}</b></li>
+      <li>Reflexiones: <b>solo las que marques</b></li>
+    </ul>
+    <button class="btn ghost sm" onclick="S.app.onboarded=false;S.app.step=1;render()">Cambiar permisos</button>`;
+  return `<div class="pro pac">
+    <aside class="card side">
+      <div class="who"><div class="av" style="background:var(--blue)">${initials(me.name)}</div><div><b style="font-size:14px">${esc(me.name)}</b><div class="tiny muted">Vinculado a ${esc(S.pro.name)}</div></div></div>
+      <nav class="pac-nav">${tabs.map(tabBtn).join("")}</nav>
+      <div class="planbox">${share}</div>
+      <button class="sos-side" onclick="S.app.sheet='sos';render()">Necesito ayuda</button>
+    </aside>
+    <main class="pac-main">
+      <div class="pac-mhead tiny muted">Vinculado a <b>${esc(S.pro.name)}</b> · solo ve lo que tú autorizas · <a href="#" onclick="event.preventDefault();S.app.onboarded=false;S.app.step=1;render()">Permisos</a></div>
+      <div class="card pac-card"><div class="scr" id="scr">${inner}</div></div>
+    </main>
+  </div>
+  <nav class="tabbar pac-tabbar">${tabs.map(tabBtn).join("")}</nav>
+  <button class="sos pac-sos" onclick="S.app.sheet='sos';render()">Necesito ayuda</button>
+  ${a.sheet === "sos" ? appSOS() : ""}`;
 }
+function pacTab(k) { S.app.open = null; S.app.tab = k; render(); window.scrollTo(0, 0); }
 
 const QUIZ = [
   {q:"Cuando tienes un mal día, ¿qué te ayuda más?", o:[["Escribir lo que me pasa","Escritura"],["Hacer algo con las manos","Arte"],["Perderme en una historia","Lectura"],["Poner música o moverme","Música"]]},
@@ -1524,7 +1555,7 @@ function saveCheckin() {
   me.lastActive = 0; a.checkedToday = true;
   render(); toast(a.consent.checkins ? "Guardado. Tu profesional verá cómo estuvo tu semana." : "Guardado solo para ti.");
 }
-function openAct(id) { S.app.open = id; S.app.actText = ""; S.app.actImg = null; S.app.actShared = true; render(); const s = $("#scr"); if (s) s.scrollTop = 0; }
+function openAct(id) { S.app.open = id; S.app.actText = ""; S.app.actImg = null; S.app.actShared = true; render(); const s = $("#scr"); if (s) s.scrollTop = 0; window.scrollTo(0, 0); }
 function appActividad(x) {
   const T = TYPES[x.type], a = S.app, me = ME();
   const as = me.assigned.find(z => z.a === x.id);
