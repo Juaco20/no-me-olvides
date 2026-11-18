@@ -309,7 +309,13 @@ tr.locked b{color:var(--mute)}
 .lp-plan{border-radius:28px;padding:26px;text-align:left;transform:rotate(var(--rot));box-shadow:0 14px 30px rgba(59,38,38,.12);display:flex;flex-direction:column;gap:10px;border:2px solid rgba(59,38,38,.06)}
 .lp-price{font-size:44px}
 .lp-price small{font-family:"Nunito",sans-serif;font-size:14px;font-weight:700;margin-left:4px}
-.lp-plan ul{margin:0 0 10px;padding-left:18px;line-height:1.7}
+.lp-plan ul{margin:0 0 10px;padding-left:18px;line-height:1.6}
+.lp-plan h3{font-size:30px;margin:4px 0 0;line-height:1}
+.lp-plan p{margin:0;font-size:15px;line-height:1.5}
+.lp-plans{scroll-margin-top:90px}
+.lp-plans .lp-sub{max-width:760px;margin-left:auto;margin-right:auto}
+.lp-pac-note{display:flex;gap:12px;align-items:center;justify-content:center;max-width:760px;margin:34px auto 0;background:#fde6ea;border-radius:99px;padding:10px 22px 10px 12px;text-align:left;font-size:15px}
+.lp-pac-note svg{flex:none}
 .lp-plan .lp-btn{margin-top:auto;align-self:flex-start}
 .lp-plan .lp-pill{align-self:flex-start}
 .lp-final{position:relative;background:#8b74d6;border-radius:36px;color:#fff;text-align:center;padding:70px 24px;margin:50px 0 30px;overflow:hidden}
@@ -449,6 +455,9 @@ tr.locked b{color:var(--mute)}
 .lp-ent-st{position:absolute;right:-14px;top:-26px;transform:rotate(12deg)}
 .lp-ent-form{background:#fffaf4;border-radius:32px;padding:28px;box-shadow:0 14px 34px rgba(59,38,38,.10)}
 .lp-ent-form h3{margin:0 0 14px;font-size:22px}
+.lp-ent-tabs{display:flex;gap:4px;background:var(--cream);border-radius:99px;padding:4px;margin-bottom:18px}
+.lp-ent-tabs button{flex:1;border:0;background:none;border-radius:99px;padding:9px 10px;font-weight:800;font-size:14px;color:var(--mute);cursor:pointer}
+.lp-ent-tabs button.on{background:#e04f73;color:#fff}
 .lp-ent-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 .lp-ent-grid label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--ink)}
 .lp-ent-grid .full{grid-column:1/-1}
@@ -789,7 +798,7 @@ function renderNav() {
   $("#nav").innerHTML = `<div class="tabs">${tabs.map(([k, l]) => `<button class="${S.view === k ? "on" : ""}" onclick="go('${k}')">${l}</button>`).join("")}</div>` +
     (u ? `<div class="user"><span class="av" style="width:32px;height:32px;font-size:12px;background:var(--green)">${initials(u.name)}</span><span class="uname">${esc(u.name)}<small>${u.role === "pro" ? "Profesional" : "Paciente"}</small></span><button class="reset" onclick="logout()">Cerrar sesión</button></div>`
      : S.authUser ? `<button class="reset" onclick="logout()">Cerrar sesión</button>`
-     : `<button class="reset nav-centros" onclick="lpScroll('#lp-centros')">Para centros</button><button class="reset" onclick="go('ingresar')">Ingresar</button><button class="btn sm" onclick="go('registro')">Crear cuenta</button>`);
+     : `<button class="reset nav-centros" onclick="lpScroll('#lp-pros')">Para profesionales</button><button class="reset" onclick="go('ingresar')">Ingresar</button><button class="btn sm" onclick="go('registro')">Crear cuenta</button>`);
 }
 const DEMO_NOTE = `<div class="demo-warn"><b>Beta académica.</b> Usa solo datos de prueba: no ingreses información real de pacientes.</div>`;
 const GBTN = label => `<button class="gbtn" type="button" onclick="googleLogin()"><img class="glogo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" width="18" height="18">${label}</button>`;
@@ -1027,10 +1036,11 @@ const logoImg = h => `<img src="${LOGO}" alt="No Me Olvides" style="height:${h}p
 const NOMI = {open: false, busy: false, msgs: [], views: ["presentacion", "ingresar", "registro"]};
 const NOMI_A = {
   crear: ["Crear cuenta gratis", "nomiGo('registro')"],
-  planes: ["Ver planes", "nomiScroll('.lp-plans')"],
+  planes: ["Para profesionales", "nomiScroll('#lp-pros')"],
+  colabora: ["Quiero colaborar", "nomiLead('colabora')"],
   biblio: ["Ver biblioteca", "nomiScroll('.lp-libsec')"],
   ingresar: ["Ingresar", "nomiGo('ingresar')"],
-  centros: ["Ir al formulario", "nomiScroll('#lp-centros')"]
+  centros: ["Conversemos", "nomiLead('centro')"]
 };
 const NOMI_KB = [
   {id: "crisis", k: ["suicid", "matarme", "quitarme la vida", "no quiero vivir", "morirme", "quiero morir", "hacerme dano", "autolesion", "cortarme", "crisis", "emergencia", "en peligro", "no aguanto mas"],
@@ -1052,17 +1062,20 @@ const NOMI_KB = [
    a: "Funciona en tres pasos. **1)** El profesional crea su cuenta gratis y recibe un código de invitación. **2)** Comparte ese código con sus pacientes, por ejemplo por WhatsApp, y ellos crean su cuenta vinculada. **3)** El paciente registra su flor y hace actividades cuando quiere; el profesional ve las tendencias que el paciente decide compartir.",
    s: ["¿Cuánto cuesta?", "¿Qué ve el profesional?"], act: ["crear"]},
   {id: "precio", k: ["precio", "cuesta", "cuanto", "valor", "planes", "pagar", "pago", "suscripcion", "tarifa", "cobran", "mensualidad", "costo"],
-   a: "Hay tres planes (precios referenciales, en validación): **Gratis**, para hasta 3 pacientes; **Pro**, $19.990 al mes, hasta 25 pacientes con la biblioteca completa y prueba de 14 días; y **Centro**, $14.990 por profesional al mes, con pacientes ilimitados, panel del equipo y reportes anónimos. Para el paciente siempre es gratis.",
-   s: ["¿Qué incluye el plan gratis?", "¿Qué incluye el plan Centro?"], act: ["planes"]},
+   a: "Para los pacientes, No Me Olvides **no tiene costo**: lo ofrece su psicólogo/a o su centro de salud. Los profesionales pueden **comenzar sin costo** con sus primeros pacientes y ver las opciones para crecer desde su panel. Para clínicas y centros preparamos una propuesta a la medida del equipo.",
+   s: ["Soy psicólogo/a, ¿cómo parto?", "Tengo un centro de salud", "¿El paciente paga?"], act: ["planes"]},
   {id: "gratis", k: ["gratis", "gratuito", "free", "sin pagar", "plan gratis", "version gratis"],
-   a: "El plan **Gratis** permite trabajar con hasta 3 pacientes, con 4 actividades básicas e historial de 7 días. El botón de ayuda en crisis está incluido en todos los planes. Es ideal para probar la plataforma antes de pasar a Pro.",
-   s: ["¿Qué incluye el plan Pro?"], act: ["crear"]},
-  {id: "pro", k: ["plan pro", "pro", "profesional independiente", "prueba de 14", "14 dias"],
-   a: "El plan **Pro** cuesta $19.990 al mes (referencial) y tiene prueba de 14 días. Incluye hasta 25 pacientes, la biblioteca completa de actividades, señales para preparar la próxima sesión, notas privadas e historial completo.",
-   s: ["¿Qué incluye el plan Centro?"], act: ["planes"]},
-  {id: "centro", k: ["plan centro", "clinica", "clinicas", "centro de salud", "institucion", "equipo de", "varios profesionales", "empresa", "cesfam", "hospital"],
-   a: "Para clínicas y centros está el plan **Centro**: $14.990 por profesional al mes (referencial), con pacientes ilimitados, un panel para todo el equipo, reportes anónimos de uso y un taller presencial trimestral. Para conversarlo, completa el formulario de la sección **“¿Tienes un centro médico?”** y el equipo te contactará.",
+   a: "Para el paciente es **gratis**, siempre. Y si eres profesional, puedes **comenzar sin costo** con tus primeros pacientes; las opciones para ampliar tu cupo las ves dentro de tu panel. El botón de ayuda en crisis está incluido para todos.",
+   s: ["Soy psicólogo/a, ¿cómo parto?"], act: ["crear"]},
+  {id: "pro", k: ["plan pro", "pro", "profesional independiente", "prueba de 14", "14 dias", "soy psicologo", "soy psicologa", "como parto", "soy terapeuta", "consulta particular"],
+   a: "Si eres psicólogo/a o terapeuta, crea tu **cuenta profesional**: comienzas sin costo, recibes tu código de invitación y puedes sumar a tus primeros pacientes de inmediato. Dentro de tu panel verás las opciones para ampliar tu cupo y la biblioteca completa.",
+   s: ["¿Cómo se suman mis pacientes?", "¿Qué ve el profesional?"], act: ["crear"]},
+  {id: "centro", k: ["plan centro", "clinica", "clinicas", "centro de salud", "tengo un centro", "institucion", "equipo de", "varios profesionales", "empresa", "cesfam", "hospital"],
+   a: "Para clínicas y centros preparamos una **propuesta a la medida**: panel para todo el equipo, reportes anónimos de uso y bienestar, e implementación acompañada con taller presencial. Déjanos tus datos en la sección **“¿Eres especialista en salud mental?”** y el equipo te contactará.",
    s: ["¿Qué pasa con los datos?", "¿Cómo se suman los pacientes?"], act: ["centros"]},
+  {id: "colabora", k: ["trabajar con ustedes", "trabajar con nosotros", "trabaja con", "colaborar", "colaboracion", "sumarme", "unirme", "postular", "especialista", "arteterapeuta", "musicoterapeuta", "crear actividades", "talleres", "facilitador", "red de"],
+   a: "¡Nos encantaría! Si eres especialista en salud mental, arteterapia, música o escritura creativa, puedes sumarte a la **red de especialistas**: diseñar actividades, guiar talleres o ayudarnos a validar el programa. Déjanos tus datos en el formulario, opción **“Soy especialista”**.",
+   s: ["¿Qué actividades hay?"], act: ["colabora"]},
   {id: "pacientes", k: ["invit", "sumar", "suman", "agregar paciente", "mis pacientes", "codigo", "vincular", "vinculo", "como entra el paciente", "como se une"],
    a: "Al crear tu cuenta de profesional recibes un **código de invitación**. Se lo compartes a tu paciente (por ejemplo por WhatsApp) y él crea su cuenta con ese código; así queda vinculado a ti. Para el paciente es gratis.",
    s: ["¿Qué ve el profesional?", "¿El paciente paga?"], act: ["crear"]},
@@ -1094,7 +1107,7 @@ const NOMI_KB = [
    a: "Puedes crear tu cuenta en un minuto con tu correo o con Google. Los profesionales eligen su región, comuna y centro de salud desde el registro oficial del Minsal. Si olvidaste tu contraseña, en la pantalla de ingreso puedes pedir un correo para cambiarla.",
    s: ["¿Cómo se suman mis pacientes?"], act: ["crear", "ingresar"]},
   {id: "demo", k: ["demo", "contacto", "contactar", "hablar con alguien", "ventas", "correo", "telefono", "whatsapp", "reunion", "cotizar", "cotizacion"],
-   a: "Para conversar sobre una implementación en tu centro, completa el formulario de la sección **“¿Tienes un centro médico?”** y el equipo te contactará. Si eres profesional independiente, lo más rápido es crear tu cuenta gratis y probarla.",
+   a: "Para conversar sobre una implementación en tu centro, déjanos tus datos en la sección **“¿Eres especialista en salud mental?”** y el equipo te contactará. Si eres profesional independiente, lo más rápido es crear tu cuenta gratis y probarla.",
    s: ["¿Qué incluye el plan Centro?"], act: ["centros"]},
   {id: "quienes", k: ["quienes son", "quien lo hizo", "equipo", "uvm", "universidad", "estudiantes", "proyecto", "beta", "de donde son"],
    a: "No Me Olvides nace como proyecto del ramo **Creación de Empresas**, de Ingeniería Comercial en la Universidad Viña del Mar. Lo que ves es una beta: funciona con cuentas reales y la estamos validando con profesionales.",
@@ -1119,10 +1132,11 @@ function nomiAnswer(q) {
     if (sc > score) { score = sc; best = it; }
   }
   if (best) return {role: "assistant", content: best.a, s: best.s || [], act: best.act || []};
-  return {role: "assistant", content: "Esa no la tengo clara todavía. Puedo contarte cómo funciona No Me Olvides, los planes, la privacidad o cómo sumar pacientes. Si es algo más específico, crea tu cuenta gratis o, si eres un centro, escríbenos desde la sección “¿Tienes un centro médico?”.", s: NOMI_SUG.slice(0, 3), act: ["centros"]};
+  return {role: "assistant", content: "Esa no la tengo clara todavía. Puedo contarte cómo funciona No Me Olvides, los planes, la privacidad o cómo sumar pacientes. Si es algo más específico, crea tu cuenta gratis o, si eres un centro o especialista, escríbenos desde la sección “¿Eres especialista en salud mental?”.", s: NOMI_SUG.slice(0, 3), act: ["centros"]};
 }
 const nomiAvatar = (s = 34) => `<img class="nomi-av" src="${(document.querySelector('link[rel="icon"]') || {}).href || ""}" alt="" width="${s}" height="${s}">`;
 const nomiFmt = t => esc(t).replace(/\\\*/g, "*").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
+function nomiLead(m) { NOMI.open = false; nomiDraw(); lpLead(m); }
 function nomiGo(v) { NOMI.open = false; nomiDraw(); go(v); }
 function nomiScroll(sel) { NOMI.open = false; nomiDraw(); if (S.view !== "presentacion") go("presentacion"); setTimeout(() => { const el = document.querySelector(sel); if (el) el.scrollIntoView({behavior: "smooth", block: "start"}); }, 60); }
 function nomiSync() {
@@ -1261,7 +1275,7 @@ function vPresentacion() {
     <h1 class="lp-display">Arte y cuidado<br>entre cada sesión</h1>
     <p class="lp-hero-p">Actividades creativas curadas por expertos, un registro emocional simple y una comunidad. Tu psicólogo/a o tu centro de salud te lo regala para acompañarte entre sesiones.</p>
     <div class="lp-hero-cta">${cta}</div>
-    <button class="lp-hero-ent" onclick="lpScroll('#lp-centros')">¿Tienes un centro médico? Conoce el plan para centros →</button>
+    <button class="lp-hero-ent" onclick="lpScroll('#lp-pros')">¿Eres especialista en salud mental? Trabaja con nosotros →</button>
     <div class="lp-hero-badge">${badge("ARTE · CUIDADO · COMUNIDAD · ", "#fde6ea", "#e04f73", 104)}<span class="lp-badge-heart">♥</span></div>
   </section>
 
@@ -1306,14 +1320,16 @@ function vPresentacion() {
     </div>
   </section>
 
-  <section class="lp-plans">
-    <h2 class="lp-display lp-sec-h">Planes</h2>
-    <p class="lp-sub">Parte gratis y crece cuando tus pacientes lo pidan. Precios referenciales, a validar.</p>
+  <section class="lp-plans" id="lp-pros">
+    <span class="lp-pill">para especialistas en salud mental</span>
+    <h2 class="lp-display lp-sec-h" style="margin-top:14px">¿Eres especialista en salud mental?</h2>
+    <p class="lp-sub">Trabaja con nosotros. No Me Olvides crece de la mano de psicólogos, terapeutas y centros de salud que quieren acompañar mejor a sus pacientes entre sesiones.</p>
     <div class="lp-plan-row">
-      <div class="lp-plan" style="background:#fffaf4;--rot:-2deg"><span class="lp-pill">Gratis</span><div class="lp-price lp-display">$0</div><ul><li>Hasta 3 pacientes</li><li>4 actividades básicas</li><li>Historial de 7 días</li><li>Avisos de ayuda incluidos</li></ul><button class="lp-btn" onclick="go('registro')">Empezar gratis</button></div>
-      <div class="lp-plan" style="background:#f38aa0;--rot:2deg"><span class="lp-pill dark">Pro · recomendado</span><div class="lp-price lp-display">$19.990<small>/mes</small></div><ul><li>Hasta 25 pacientes</li><li>Biblioteca completa</li><li>Señales para la próxima sesión</li><li>Notas privadas e historial</li></ul><button class="lp-btn" onclick="go('registro')">Probar 14 días</button></div>
-      <div class="lp-plan" style="background:#8b74d6;color:#fff;--rot:-1.5deg"><span class="lp-pill">Centro</span><div class="lp-price lp-display">$14.990<small>/prof./mes</small></div><ul><li>Pacientes ilimitados</li><li>Panel del equipo</li><li>Reportes anónimos</li><li>Taller presencial trimestral</li></ul><button class="lp-btn" onclick="lpScroll('#lp-centros')">Quiero una demo</button></div>
+      <div class="lp-plan" style="background:#fffaf4;--rot:-2deg"><span class="lp-pill">Psicólogos y terapeutas</span><h3 class="lp-display">Ofrécelo a tus pacientes</h3><p>Crea tu cuenta, invita a tus pacientes con un código y llega a cada sesión con contexto.</p><ul><li>El ánimo y las actividades de tus pacientes, solo con su permiso</li><li>Una biblioteca creativa para asignar entre sesiones</li><li>Comienzas sin costo con tus primeros pacientes</li></ul><button class="lp-btn" onclick="go('registro')">Crear cuenta profesional</button></div>
+      <div class="lp-plan" style="background:#f38aa0;--rot:2deg"><span class="lp-pill dark">Clínicas y centros</span><h3 class="lp-display">Llévalo a tu equipo</h3><p>Un programa de acompañamiento creativo para todos tus pacientes, con una propuesta a la medida de tu centro.</p><ul><li>Panel para todo el equipo</li><li>Reportes anónimos de uso y bienestar</li><li>Implementación acompañada y taller presencial</li></ul><button class="lp-btn" onclick="lpLead('centro')">Conversemos</button></div>
+      <div class="lp-plan" style="background:#8b74d6;color:#fff;--rot:-1.5deg"><span class="lp-pill">Red de especialistas</span><h3 class="lp-display">Crea con nosotros</h3><p>¿Eres psicólogo/a, arteterapeuta, musicoterapeuta o facilitador/a? Súmate a la red que da vida a No Me Olvides.</p><ul><li>Diseña actividades para la biblioteca</li><li>Guía talleres y círculos de la comunidad</li><li>Sé parte del equipo que valida el programa</li></ul><button class="lp-btn" onclick="lpLead('colabora')">Quiero colaborar</button></div>
     </div>
+    <div class="lp-pac-note">${flowerArtSvg()}<span><b>¿Eres paciente?</b> No Me Olvides no tiene costo para ti. Tu psicólogo/a o tu centro de salud te entrega el código para entrar.</span></div>
   </section>
 
   ${lpCentros()}
@@ -1826,58 +1842,80 @@ function albumImport() {
 }
 
 /* ---------- Centros (enterprise) ---------- */
-const LEAD = {sent: false, busy: false, name: ""};
+const LEAD = {sent: false, busy: false, name: "", mode: "centro"};
 function lpScroll(sel) { if (S.view !== "presentacion") go("presentacion"); setTimeout(() => { const el = document.querySelector(sel); if (el) el.scrollIntoView({behavior: "smooth", block: "start"}); }, 60); }
+const flowerArtSvg = () => `<svg width="38" height="38" viewBox="0 0 120 120" aria-hidden="true">${flowerArt()}</svg>`;
+function lpLead(mode) { LEAD.mode = mode; LEAD.sent = false; const el = document.getElementById("lp-centros"); if (el && S.view === "presentacion") el.outerHTML = lpCentros(); else { S.view = "presentacion"; render(); } lpScroll("#lp-centros"); }
 function lpCentros() {
   const opt = arr => arr.map(x => `<option>${x}</option>`).join("");
-  return `<section class="lp-ent" id="lp-centros">
-    <div class="lp-ent-info">
+  const col = LEAD.mode === "colabora";
+  const regs = opt(REGIONES.map(r => r[0]));
+  const info = col ? `
+      <span class="lp-pill">red de especialistas</span>
+      <h2 class="lp-display">Crea con nosotros</h2>
+      <p>Buscamos especialistas que quieran poner su experiencia al servicio de otros, desde lo creativo.</p>
+      <ul class="lp-ent-list">
+        <li><b>Diseña actividades</b> de escritura, arte, lectura, música o cuerpo para la biblioteca.</li>
+        <li><b>Guía talleres y círculos</b> presenciales u online para la comunidad.</li>
+        <li><b>Valida el programa</b> con tu mirada clínica y ayúdanos a hacerlo más seguro.</li>
+        <li><b>Usa No Me Olvides</b> con tus propios pacientes desde el primer día.</li>
+      </ul>` : `
       <span class="lp-pill">para clínicas y centros de salud</span>
-      <h2 class="lp-display">¿Tienes un centro médico?</h2>
-      <p>Llevamos No Me Olvides a todo tu equipo, con un plan a la medida del tamaño de tu centro.</p>
+      <h2 class="lp-display">¿Tienes un centro de salud?</h2>
+      <p>Llevamos No Me Olvides a todo tu equipo, con una propuesta a la medida de tu centro.</p>
       <ul class="lp-ent-list">
         <li><b>Panel del equipo</b> para coordinar a todos tus profesionales y sus pacientes.</li>
         <li><b>Reportes anónimos</b> de uso y bienestar para mostrar el impacto del programa.</li>
         <li><b>Implementación acompañada</b>, capacitación y un taller presencial para el equipo.</li>
-        <li><b>Precio por volumen</b> y facturación para empresas e instituciones.</li>
+        <li><b>Propuesta a la medida</b> según el tamaño de tu equipo, con facturación para instituciones.</li>
         <li><b>Material listo</b> para presentar el programa a tus pacientes.</li>
-      </ul>
-      <div class="lp-ent-st">${sticker("flor", 110)}</div>
-    </div>
-    <div class="lp-ent-form">${LEAD.sent ? `<div class="lp-ent-ok">${sticker("nota", 100)}<h3 class="lp-display">¡Gracias${LEAD.name ? ", " + esc(LEAD.name) : ""}!</h3><p>Recibimos tu solicitud. Te escribiremos dentro de los próximos días hábiles para coordinar una demo.</p></div>` : `
-      <form onsubmit="event.preventDefault();sendLead(this)" novalidate>
-        <h3>Solicita una demo para tu centro</h3>
-        <div class="lp-ent-grid">
+      </ul>`;
+  const fields = col ? `
+          <label>Nombre y apellido*<input name="nombre" maxlength="80" required autocomplete="name"></label>
+          <label>Profesión o especialidad*<select name="profesion" required><option value="">Selecciona</option>${opt(["Psicólogo/a", "Psiquiatra", "Terapeuta ocupacional", "Arteterapeuta", "Musicoterapeuta", "Escritor/a o tallerista", "Otra"])}</select></label>
+          <label class="full">¿Cómo te gustaría colaborar?*<select name="modo" required><option value="">Selecciona</option>${opt(["Usar No Me Olvides con mis pacientes", "Crear actividades para la biblioteca", "Guiar talleres o círculos", "Validar el programa como asesor/a", "Otra forma"])}</select></label>` : `
           <label>Nombre y apellido*<input name="nombre" maxlength="80" required autocomplete="name"></label>
           <label>Cargo<input name="cargo" maxlength="80" placeholder="Ej: directora clínica" autocomplete="organization-title"></label>
           <label class="full">Nombre del centro*<input name="centro" maxlength="120" required autocomplete="organization"></label>
           <label>Tipo de centro*<select name="tipo" required><option value="">Selecciona</option>${opt(["Clínica", "Centro médico", "Centro de salud mental", "CESFAM / atención primaria", "Hospital", "Universidad o colegio", "Empresa (bienestar laboral)", "Otro"])}</select></label>
-          <label>N.º de profesionales*<select name="equipo" required><option value="">Selecciona</option>${opt(["1 a 5", "6 a 20", "21 a 50", "Más de 50"])}</select></label>
-          <label>Región<select name="region"><option value="">Selecciona</option>${opt(REGIONES.map(r => r.n || r.name || r[0] || r))}</select></label>
+          <label>N.º de profesionales*<select name="equipo" required><option value="">Selecciona</option>${opt(["1 a 5", "6 a 20", "21 a 50", "Más de 50"])}</select></label>`;
+  return `<section class="lp-ent" id="lp-centros">
+    <div class="lp-ent-info">${info}
+      <div class="lp-ent-st">${sticker(col ? "paleta" : "flor", 110)}</div>
+    </div>
+    <div class="lp-ent-form">
+      <div class="lp-ent-tabs" role="tablist"><button role="tab" aria-selected="${!col}" class="${col ? "" : "on"}" onclick="lpLead('centro')">Tengo un centro de salud</button><button role="tab" aria-selected="${col}" class="${col ? "on" : ""}" onclick="lpLead('colabora')">Soy especialista</button></div>
+      ${LEAD.sent ? `<div class="lp-ent-ok">${sticker("nota", 100)}<h3 class="lp-display">¡Gracias${LEAD.name ? ", " + esc(LEAD.name) : ""}!</h3><p>${col ? "Recibimos tus datos. Te escribiremos dentro de los próximos días hábiles para conversar cómo colaborar." : "Recibimos tu solicitud. Te escribiremos dentro de los próximos días hábiles para coordinar una demo."}</p></div>` : `
+      <form onsubmit="event.preventDefault();sendLead(this)" novalidate>
+        <h3>${col ? "Súmate a la red de especialistas" : "Solicita una demo para tu centro"}</h3>
+        <div class="lp-ent-grid">${fields}
+          <label>Región<select name="region"><option value="">Selecciona</option>${regs}</select></label>
           <label>Ciudad o comuna<input name="ciudad" maxlength="80"></label>
           <label>Correo*<input name="email" type="email" maxlength="120" required autocomplete="email"></label>
           <label>Teléfono<input name="telefono" type="tel" maxlength="30" autocomplete="tel"></label>
-          <label class="full">¿Qué te gustaría lograr?<textarea name="mensaje" rows="3" maxlength="1000" placeholder="Cuéntanos sobre tu centro y tus pacientes"></textarea></label>
+          <label class="full">${col ? "Cuéntanos de ti" : "¿Qué te gustaría lograr?"}<textarea name="mensaje" rows="3" maxlength="1000" placeholder="${col ? "Tu experiencia, enfoque o ideas para la comunidad" : "Cuéntanos sobre tu centro y tus pacientes"}"></textarea></label>
           <input name="web" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
           <label class="full lp-ent-ck"><input type="checkbox" name="ok" required> Acepto que el equipo de No Me Olvides me contacte por esta solicitud.</label>
         </div>
         <div class="lp-ent-err" id="lead-err"></div>
-        <button class="lp-btn" ${LEAD.busy ? "disabled" : ""}>${LEAD.busy ? "Enviando…" : "Quiero una demo"}</button>
+        <button class="lp-btn">${col ? "Quiero colaborar" : "Quiero una demo"}</button>
       </form>`}</div>
   </section>`;
 }
 async function sendLead(f) {
   const v = Object.fromEntries(new FormData(f).entries()), err = m => { const e = $("#lead-err"); if (e) e.textContent = m; };
   if (v.web) { LEAD.sent = true; render(); return; }
-  if (!v.nombre.trim() || !v.centro.trim() || !v.tipo || !v.equipo) return err("Completa los campos marcados con *.");
+  const col = LEAD.mode === "colabora";
+  if (col) { v.centro = "Especialista: " + (v.profesion || ""); v.tipo = "Colaboración: " + (v.modo || ""); v.equipo = "—"; v.cargo = v.profesion || ""; }
+  if (!v.nombre.trim() || (col ? !v.profesion || !v.modo : !v.centro.trim() || !v.tipo || !v.equipo)) return err("Completa los campos marcados con *.");
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) return err("Revisa tu correo.");
   if (!v.ok) return err("Necesitamos tu autorización para contactarte.");
   if (!db) return err("No pudimos conectarnos. Inténtalo de nuevo en un momento.");
   LEAD.busy = true; err("");
   const btn = f.querySelector("button"); if (btn) { btn.disabled = true; btn.textContent = "Enviando…"; }
-  const data = {nombre: v.nombre.trim(), cargo: (v.cargo || "").trim(), centro: v.centro.trim(), tipo: v.tipo, equipo: v.equipo, region: v.region || "", ciudad: (v.ciudad || "").trim(), email: v.email.trim(), telefono: (v.telefono || "").trim(), mensaje: (v.mensaje || "").trim(), creado: new Date().toISOString(), origen: "landing"};
-  try { await F.addDoc(F.collection(db, "leads"), data); LEAD.sent = true; LEAD.name = firstName(data.nombre); render(); lpScroll("#lp-centros"); }
-  catch (e) { console.error(e); err("No pudimos enviar tu solicitud. Inténtalo de nuevo en un momento."); if (btn) { btn.disabled = false; btn.textContent = "Quiero una demo"; } }
+  const data = {nombre: v.nombre.trim(), cargo: (v.cargo || "").trim(), centro: v.centro.trim(), tipo: v.tipo, equipo: v.equipo, region: v.region || "", ciudad: (v.ciudad || "").trim(), email: v.email.trim(), telefono: (v.telefono || "").trim(), mensaje: (v.mensaje || "").trim(), creado: new Date().toISOString(), origen: col ? "especialista" : "centro"};
+  try { await F.addDoc(F.collection(db, "leads"), data); LEAD.sent = true; LEAD.name = firstName(data.nombre); const el = document.getElementById("lp-centros"); if (el) el.outerHTML = lpCentros(); lpScroll("#lp-centros"); }
+  catch (e) { console.error(e); err("No pudimos enviar tu solicitud. Inténtalo de nuevo en un momento."); if (btn) { btn.disabled = false; btn.textContent = col ? "Quiero colaborar" : "Quiero una demo"; } }
   LEAD.busy = false;
 }
 
