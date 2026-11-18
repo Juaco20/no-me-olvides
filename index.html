@@ -363,6 +363,117 @@ tr.locked b{color:var(--mute)}
 .nomi-foot{font-size:11px;color:#7a6464;padding:0 14px 10px;text-align:center}
 @media (max-width:620px){#nomi{right:10px;bottom:10px}.nomi-fab span{display:none}.nomi-fab{padding:6px}}
 .nomi-acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+/* ---------- jardín ---------- */
+.ghead{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap}
+.gnav{display:flex;align-items:center;gap:8px;background:var(--cream);border:1px solid var(--line);border-radius:99px;padding:4px}
+.gnav b{min-width:128px;text-align:center;font-size:14px}
+.gnav button{border:0;background:#fff;border-radius:50%;width:30px;height:30px;font-size:18px;line-height:1;color:var(--ink);cursor:pointer}
+.gnav button:disabled{opacity:.35;cursor:default}
+.gwrap{position:relative;margin-top:14px;border-radius:22px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(59,38,38,.06)}
+.gscene{display:block;width:100%;height:auto;aspect-ratio:1000/360;min-height:220px}
+.gf{cursor:pointer;transform-box:fill-box;transform-origin:50% 100%}
+.gscene.anim .gf{animation:g-grow .7s cubic-bezier(.3,1.4,.5,1) both;animation-delay:var(--d)}
+.gf:hover{filter:brightness(1.06)}
+.gf.on{filter:drop-shadow(0 0 6px rgba(224,79,115,.55))}
+@keyframes g-grow{from{transform:scaleY(0);opacity:0}to{transform:scaleY(1);opacity:1}}
+.gtoday{cursor:pointer;animation:g-pulse 1.8s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes g-pulse{50%{transform:scale(1.12)}}
+.gsun.on{transform-box:fill-box;transform-origin:center;animation:g-spin 40s linear infinite}
+@keyframes g-spin{to{transform:rotate(360deg)}}
+.gcloud{animation:g-drift 26s ease-in-out infinite alternate}.gcloud.c2{animation-duration:34s}
+@keyframes g-drift{to{transform:translateX(60px)}}
+.gbf{animation:g-fly 9s ease-in-out infinite}
+@keyframes g-fly{0%,100%{transform:translate(0,0) rotate(-6deg)}25%{transform:translate(30px,-16px) rotate(6deg)}50%{transform:translate(60px,4px) rotate(-4deg)}75%{transform:translate(24px,14px) rotate(5deg)}}
+@media (prefers-reduced-motion:reduce){.gf,.gtoday,.gsun.on,.gcloud,.gbf{animation:none}}
+.gempty{position:absolute;left:50%;top:38%;transform:translate(-50%,-50%);background:rgba(255,250,244,.92);border-radius:18px;padding:14px 18px;text-align:center;display:flex;flex-direction:column;gap:6px;align-items:center;max-width:86%;box-shadow:0 8px 20px rgba(59,38,38,.1)}
+.gempty span{font-size:13px;color:var(--mute)}
+.gdet{display:flex;gap:14px;align-items:flex-start}
+.gcap::first-letter{text-transform:uppercase}
+.gnote{margin:8px 0 0;font-style:italic;color:#5a4545}
+.gchip{display:inline-block;background:var(--blue2);color:#5a43a8;border-radius:99px;padding:4px 11px;font-size:12.5px;font-weight:700}
+.gstats{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.gst{background:var(--paper);border:1px solid var(--line);border-radius:18px;padding:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:2px;font-size:12.5px;color:var(--mute);min-height:92px}
+.gst .lp-display{font-size:32px;color:var(--ink)}
+.gcal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.gcal>b{font-size:11px;text-align:center;color:var(--mute);font-weight:700}
+.gcal button{border:0;background:#fff;border-radius:12px;min-height:54px;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:4px 0;gap:0;font-size:11px;color:var(--mute);cursor:default}
+.gcal button.has{cursor:pointer;color:var(--ink);font-weight:700}
+.gcal button.has:hover{background:var(--blue2)}
+.gcal button.on{box-shadow:0 0 0 2px #e04f73 inset}
+.gcal button.today{box-shadow:0 0 0 2px #f8d34a inset;cursor:pointer}
+.gcal button:disabled{background:transparent}
+.gcal em{width:5px;height:5px;border-radius:50%;background:#e7dccf;margin-top:9px}
+.gmiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:12px}
+.gmiles div{display:flex;flex-direction:column;align-items:center;text-align:center;padding:10px 6px;border-radius:14px;background:#fff;border:1px dashed var(--line);opacity:.6}
+.gmiles div.ok{opacity:1;border:1px solid #f3b6c3;background:#fde6ea}
+.gmiles span{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--cream);font-weight:800;font-size:13px;margin-bottom:4px}
+.gmiles .ok span{background:#e04f73;color:#fff}
+.gmiles b{font-size:13px}.gmiles small{font-size:11px;color:var(--mute)}
+/* ---------- álbum ---------- */
+.alb-f{display:flex;gap:6px;flex-wrap:wrap;margin-top:14px}
+.alb-f button{border:1.5px solid var(--line);background:#fff;border-radius:99px;padding:6px 12px;font-size:13px;font-weight:700;color:var(--mute);cursor:pointer}
+.alb-f button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.alb-grid{columns:3 220px;column-gap:12px;margin-top:14px}
+.alb-card{break-inside:avoid;display:block;width:100%;margin:0 0 12px;border:0;padding:0;background:#fff;border-radius:18px;overflow:hidden;text-align:left;cursor:pointer;position:relative;box-shadow:0 1px 2px rgba(59,38,38,.06),0 6px 16px rgba(59,38,38,.06);transition:transform .15s}
+.alb-card:hover{transform:translateY(-3px)}
+.alb-card img{display:block;width:100%;height:auto}
+.alb-txt{padding:18px 16px 14px;min-height:120px}
+.alb-txt span{font-size:26px;font-weight:800}
+.alb-txt p{margin:6px 0 0;color:var(--ink);font-size:14.5px;line-height:1.45}
+.alb-meta{padding:10px 14px 12px;display:flex;flex-direction:column}
+.alb-meta b{font-size:14px}.alb-meta small{font-size:12px;color:var(--mute)}
+.alb-star{position:absolute;top:10px;right:10px;width:30px;height:30px;border-radius:50%;background:#fffaf4;color:#e04f73;display:grid;place-items:center;font-size:16px;box-shadow:0 2px 8px rgba(59,38,38,.15)}
+.alb-empty{text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px;padding:26px 18px}
+.alb-ov{position:fixed;inset:0;z-index:75;background:rgba(40,24,24,.55);display:flex;align-items:center;justify-content:center;padding:16px}
+.alb-box{position:relative;background:var(--paper);border-radius:24px;max-width:720px;width:100%;max-height:92vh;overflow:auto;box-shadow:0 24px 60px rgba(0,0,0,.25)}
+.alb-close{position:absolute;top:12px;right:12px;z-index:2;background:rgba(255,250,244,.9)}
+.alb-big{display:block;width:100%;max-height:60vh;object-fit:contain;background:#2b1f1f}
+.alb-body{padding:18px 20px 20px}
+.alb-full{font-size:15px;line-height:1.55;margin:8px 0 4px}
+.alb-show{position:fixed;inset:0;z-index:80;background:var(--cream);display:flex;flex-direction:column;padding:16px 20px calc(16px + env(safe-area-inset-bottom))}
+.alb-show-top{display:flex;align-items:center;gap:12px}.alb-show-top span{color:var(--mute);font-size:13px;margin-left:auto}
+.alb-show-main{flex:1;min-height:0;display:flex;gap:28px;align-items:center;justify-content:center;padding:18px 0}
+.alb-show-main img{max-height:100%;max-width:58%;object-fit:contain;border-radius:18px;box-shadow:0 18px 40px rgba(59,38,38,.2)}
+.alb-show-txt{max-width:520px;overflow:auto;max-height:100%}.alb-show-txt p{font-size:18px;line-height:1.55}
+.alb-show-nav{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.alb-dots{display:flex;gap:6px}.alb-dots i{width:8px;height:8px;border-radius:50%;background:#e7dccf}.alb-dots i.on{background:#e04f73}
+.lp-btn:disabled{opacity:.4;cursor:default;transform:none}
+/* ---------- centros ---------- */
+.lp-ent{display:grid;grid-template-columns:1fr 1.1fr;gap:28px;align-items:start;margin:60px 0 10px;scroll-margin-top:90px}
+.lp-ent-info{position:relative;background:#fdf1c4;border-radius:32px;padding:34px 30px 40px}
+.lp-ent-info h2{font-size:clamp(36px,4.6vw,56px);color:var(--ink);margin:14px 0 10px}
+.lp-ent-info p{font-size:16.5px;margin:0 0 14px}
+.lp-ent-list{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:10px}
+.lp-ent-list li{padding-left:30px;position:relative;font-size:15px;line-height:1.45}
+.lp-ent-list li::before{content:"✓";position:absolute;left:0;top:0;width:21px;height:21px;border-radius:50%;background:#e04f73;color:#fff;font-size:12px;font-weight:800;display:grid;place-items:center}
+.lp-ent-st{position:absolute;right:-14px;top:-26px;transform:rotate(12deg)}
+.lp-ent-form{background:#fffaf4;border-radius:32px;padding:28px;box-shadow:0 14px 34px rgba(59,38,38,.10)}
+.lp-ent-form h3{margin:0 0 14px;font-size:22px}
+.lp-ent-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lp-ent-grid label{display:flex;flex-direction:column;gap:5px;font-size:13px;font-weight:700;color:var(--ink)}
+.lp-ent-grid .full{grid-column:1/-1}
+.lp-ent-grid input,.lp-ent-grid select,.lp-ent-grid textarea{border:1.5px solid var(--line);border-radius:14px;padding:10px 12px;background:#fff;font:inherit;font-weight:400;font-size:14.5px;min-width:0}
+.lp-ent-grid input:focus,.lp-ent-grid select:focus,.lp-ent-grid textarea:focus{outline:none;border-color:#e04f73}
+.lp-ent-ck{flex-direction:row!important;align-items:flex-start;font-weight:400!important;gap:8px!important}
+.lp-ent-ck input{width:18px;height:18px;accent-color:#e04f73;margin-top:1px;flex:none}
+.lp-ent-err{color:var(--danger);font-size:13.5px;min-height:20px;margin:8px 0}
+.lp-ent-ok{text-align:center;padding:30px 10px;display:flex;flex-direction:column;align-items:center}
+.lp-ent-ok h3{font-size:34px;margin:10px 0}
+.lp-hero-ent{display:inline-block;margin-top:16px;color:#fff;font-weight:700;text-decoration:underline;text-underline-offset:3px;position:relative;z-index:2;cursor:pointer;background:none;border:0;font-size:15px}
+@media (max-width:980px){.lp-ent{grid-template-columns:1fr}}
+@media (max-width:860px){
+  .tabbar.pac-tabbar{grid-template-columns:repeat(6,1fr)}
+  .tabbar.pac-tabbar button{font-size:10px;padding:4px 0}
+  .gstats{grid-template-columns:repeat(2,1fr)}
+  .gmiles{grid-template-columns:repeat(2,1fr)}
+  .alb-grid{columns:2 140px}
+  .alb-show-main{flex-direction:column;gap:14px;overflow:auto}
+  .alb-show-main img{max-width:100%;max-height:52vh}
+  .alb-show-txt p{font-size:16px}
+  .ghead .gnav{width:100%;justify-content:space-between}
+}
+@media (max-width:620px){.lp-ent-grid{grid-template-columns:1fr}.lp-ent-form{padding:20px}.lp-ent-info{padding:28px 20px 30px}.lp-ent-st{display:none}.nav-centros{display:none}}
+
 /* modal */
 .modal{position:fixed;inset:0;background:rgba(22,36,30,.4);z-index:50;display:grid;place-items:center;padding:20px}
 .modal .in{background:var(--paper);border-radius:18px;max-width:640px;width:100%;max-height:86vh;overflow:auto;padding:22px}
@@ -498,7 +609,7 @@ const DEMO = [
   {email: "martina@nomeolvides.demo", pass: "demo1234", name: "Martina Rojas", role: "pac"}
 ];
 function defaultApp() {
-  return {onboarded:false, step:1, consent:{checkins:true, actividades:true, reflexiones:false}, answers:[], profile:null, tab:"hoy", open:null, mood:null, emos:[], moodNote:"", checkedToday:false, sheet:null, journal:[], draft:"", draftShared:false, actText:"", actShared:true, actImg:null, joined:[]};
+  return {onboarded:false, step:1, consent:{checkins:true, actividades:true, reflexiones:false}, answers:[], profile:null, tab:"hoy", open:null, mood:null, emos:[], moodNote:"", checkedToday:false, sheet:null, journal:[], draft:"", draftShared:false, actText:"", actShared:true, actImg:null, joined:[], garden:{}, album:[], albF:"todo", gMonth:0};
 }
 
 const S = {view:"presentacion", proTab:"resumen", proPatient:null, libFilter:"Todos", pro:null, patients:[], me:null, app:null, reg:null,
@@ -528,14 +639,14 @@ function fromRemote(id, r) {
 function toRemoteApp(a) {
   const keep = {onboarded: a.onboarded, step: a.step, consent: a.consent, answers: a.answers, profile: a.profile, joined: a.joined,
     journal: (a.journal || []).map(j => ({day: TODAYN - j.date, text: j.text, shared: !!j.shared})),
-    checkedDay: a.checkedToday ? TODAYN : null, mood: a.checkedToday ? a.mood : null, emos: a.checkedToday ? a.emos : []};
+    checkedDay: a.checkedToday ? TODAYN : null, mood: a.checkedToday ? a.mood : null, emos: a.checkedToday ? a.emos : [], garden: a.garden || {}, albumImported: !!a.albumImported};
   return JSON.parse(JSON.stringify(keep));
 }
 function fromRemoteApp(r) {
   const a = defaultApp();
   if (!r) return a;
   Object.assign(a, {onboarded: !!r.onboarded, step: r.step || 1, consent: r.consent || a.consent, answers: r.answers || [], profile: r.profile || null, joined: r.joined || [],
-    journal: (r.journal || []).map(j => ({date: TODAYN - j.day, text: j.text, shared: !!j.shared}))});
+    journal: (r.journal || []).map(j => ({date: TODAYN - j.day, text: j.text, shared: !!j.shared})), garden: r.garden || {}, albumImported: !!r.albumImported});
   if (r.checkedDay === TODAYN) { a.checkedToday = true; a.mood = r.mood; a.emos = r.emos || []; }
   return a;
 }
@@ -612,6 +723,7 @@ async function loadSession(uid, profile) {
     S.app = fromRemoteApp(ap.exists() ? ap.data() : null);
     lastSent["app"] = stable(toRemoteApp(S.app));
     S.me = uid;
+    albumLoad();
     unsubs.push(F.onSnapshot(F.doc(db, "pros", profile.proId, "patients", uid), snap => {
       if (!snap.exists()) return;
       const p = fromRemote(uid, snap.data());
@@ -677,7 +789,7 @@ function renderNav() {
   $("#nav").innerHTML = `<div class="tabs">${tabs.map(([k, l]) => `<button class="${S.view === k ? "on" : ""}" onclick="go('${k}')">${l}</button>`).join("")}</div>` +
     (u ? `<div class="user"><span class="av" style="width:32px;height:32px;font-size:12px;background:var(--green)">${initials(u.name)}</span><span class="uname">${esc(u.name)}<small>${u.role === "pro" ? "Profesional" : "Paciente"}</small></span><button class="reset" onclick="logout()">Cerrar sesión</button></div>`
      : S.authUser ? `<button class="reset" onclick="logout()">Cerrar sesión</button>`
-     : `<button class="reset" onclick="go('ingresar')">Ingresar</button><button class="btn sm" onclick="go('registro')">Crear cuenta</button>`);
+     : `<button class="reset nav-centros" onclick="lpScroll('#lp-centros')">Para centros</button><button class="reset" onclick="go('ingresar')">Ingresar</button><button class="btn sm" onclick="go('registro')">Crear cuenta</button>`);
 }
 const DEMO_NOTE = `<div class="demo-warn"><b>Beta académica.</b> Usa solo datos de prueba: no ingreses información real de pacientes.</div>`;
 const GBTN = label => `<button class="gbtn" type="button" onclick="googleLogin()"><img class="glogo" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="" width="18" height="18">${label}</button>`;
@@ -917,7 +1029,8 @@ const NOMI_A = {
   crear: ["Crear cuenta gratis", "nomiGo('registro')"],
   planes: ["Ver planes", "nomiScroll('.lp-plans')"],
   biblio: ["Ver biblioteca", "nomiScroll('.lp-libsec')"],
-  ingresar: ["Ingresar", "nomiGo('ingresar')"]
+  ingresar: ["Ingresar", "nomiGo('ingresar')"],
+  centros: ["Ir al formulario", "nomiScroll('#lp-centros')"]
 };
 const NOMI_KB = [
   {id: "crisis", k: ["suicid", "matarme", "quitarme la vida", "no quiero vivir", "morirme", "quiero morir", "hacerme dano", "autolesion", "cortarme", "crisis", "emergencia", "en peligro", "no aguanto mas"],
@@ -948,8 +1061,8 @@ const NOMI_KB = [
    a: "El plan **Pro** cuesta $19.990 al mes (referencial) y tiene prueba de 14 días. Incluye hasta 25 pacientes, la biblioteca completa de actividades, señales para preparar la próxima sesión, notas privadas e historial completo.",
    s: ["¿Qué incluye el plan Centro?"], act: ["planes"]},
   {id: "centro", k: ["plan centro", "clinica", "clinicas", "centro de salud", "institucion", "equipo de", "varios profesionales", "empresa", "cesfam", "hospital"],
-   a: "Para clínicas y centros está el plan **Centro**: $14.990 por profesional al mes (referencial), con pacientes ilimitados, un panel para todo el equipo, reportes anónimos de uso y un taller presencial trimestral. Para conversarlo, usa el botón “Quiero una demo” en la sección de planes.",
-   s: ["¿Qué pasa con los datos?", "¿Cómo se suman los pacientes?"], act: ["planes"]},
+   a: "Para clínicas y centros está el plan **Centro**: $14.990 por profesional al mes (referencial), con pacientes ilimitados, un panel para todo el equipo, reportes anónimos de uso y un taller presencial trimestral. Para conversarlo, completa el formulario de la sección **“¿Tienes un centro médico?”** y el equipo te contactará.",
+   s: ["¿Qué pasa con los datos?", "¿Cómo se suman los pacientes?"], act: ["centros"]},
   {id: "pacientes", k: ["invit", "sumar", "suman", "agregar paciente", "mis pacientes", "codigo", "vincular", "vinculo", "como entra el paciente", "como se une"],
    a: "Al crear tu cuenta de profesional recibes un **código de invitación**. Se lo compartes a tu paciente (por ejemplo por WhatsApp) y él crea su cuenta con ese código; así queda vinculado a ti. Para el paciente es gratis.",
    s: ["¿Qué ve el profesional?", "¿El paciente paga?"], act: ["crear"]},
@@ -981,8 +1094,8 @@ const NOMI_KB = [
    a: "Puedes crear tu cuenta en un minuto con tu correo o con Google. Los profesionales eligen su región, comuna y centro de salud desde el registro oficial del Minsal. Si olvidaste tu contraseña, en la pantalla de ingreso puedes pedir un correo para cambiarla.",
    s: ["¿Cómo se suman mis pacientes?"], act: ["crear", "ingresar"]},
   {id: "demo", k: ["demo", "contacto", "contactar", "hablar con alguien", "ventas", "correo", "telefono", "whatsapp", "reunion", "cotizar", "cotizacion"],
-   a: "Para conversar sobre una implementación en tu centro, usa el botón **“Quiero una demo”** en la sección de planes. Si eres profesional independiente, lo más rápido es crear tu cuenta gratis y probarla.",
-   s: ["¿Qué incluye el plan Centro?"], act: ["planes"]},
+   a: "Para conversar sobre una implementación en tu centro, completa el formulario de la sección **“¿Tienes un centro médico?”** y el equipo te contactará. Si eres profesional independiente, lo más rápido es crear tu cuenta gratis y probarla.",
+   s: ["¿Qué incluye el plan Centro?"], act: ["centros"]},
   {id: "quienes", k: ["quienes son", "quien lo hizo", "equipo", "uvm", "universidad", "estudiantes", "proyecto", "beta", "de donde son"],
    a: "No Me Olvides nace como proyecto del ramo **Creación de Empresas**, de Ingeniería Comercial en la Universidad Viña del Mar. Lo que ves es una beta: funciona con cuentas reales y la estamos validando con profesionales.",
    s: ["¿Qué es No Me Olvides?"]},
@@ -1006,7 +1119,7 @@ function nomiAnswer(q) {
     if (sc > score) { score = sc; best = it; }
   }
   if (best) return {role: "assistant", content: best.a, s: best.s || [], act: best.act || []};
-  return {role: "assistant", content: "Esa no la tengo clara todavía. Puedo contarte cómo funciona No Me Olvides, los planes, la privacidad o cómo sumar pacientes. Si es algo más específico, crea tu cuenta gratis o pide una demo desde la sección de planes.", s: NOMI_SUG.slice(0, 3), act: ["planes"]};
+  return {role: "assistant", content: "Esa no la tengo clara todavía. Puedo contarte cómo funciona No Me Olvides, los planes, la privacidad o cómo sumar pacientes. Si es algo más específico, crea tu cuenta gratis o, si eres un centro, escríbenos desde la sección “¿Tienes un centro médico?”.", s: NOMI_SUG.slice(0, 3), act: ["centros"]};
 }
 const nomiAvatar = (s = 34) => `<img class="nomi-av" src="${(document.querySelector('link[rel="icon"]') || {}).href || ""}" alt="" width="${s}" height="${s}">`;
 const nomiFmt = t => esc(t).replace(/\\\*/g, "*").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").replace(/\n/g, "<br>");
@@ -1148,6 +1261,7 @@ function vPresentacion() {
     <h1 class="lp-display">Arte y cuidado<br>entre cada sesión</h1>
     <p class="lp-hero-p">Actividades creativas curadas por expertos, un registro emocional simple y una comunidad. Tu psicólogo/a o tu centro de salud te lo regala para acompañarte entre sesiones.</p>
     <div class="lp-hero-cta">${cta}</div>
+    <button class="lp-hero-ent" onclick="lpScroll('#lp-centros')">¿Tienes un centro médico? Conoce el plan para centros →</button>
     <div class="lp-hero-badge">${badge("ARTE · CUIDADO · COMUNIDAD · ", "#fde6ea", "#e04f73", 104)}<span class="lp-badge-heart">♥</span></div>
   </section>
 
@@ -1198,9 +1312,11 @@ function vPresentacion() {
     <div class="lp-plan-row">
       <div class="lp-plan" style="background:#fffaf4;--rot:-2deg"><span class="lp-pill">Gratis</span><div class="lp-price lp-display">$0</div><ul><li>Hasta 3 pacientes</li><li>4 actividades básicas</li><li>Historial de 7 días</li><li>Avisos de ayuda incluidos</li></ul><button class="lp-btn" onclick="go('registro')">Empezar gratis</button></div>
       <div class="lp-plan" style="background:#f38aa0;--rot:2deg"><span class="lp-pill dark">Pro · recomendado</span><div class="lp-price lp-display">$19.990<small>/mes</small></div><ul><li>Hasta 25 pacientes</li><li>Biblioteca completa</li><li>Señales para la próxima sesión</li><li>Notas privadas e historial</li></ul><button class="lp-btn" onclick="go('registro')">Probar 14 días</button></div>
-      <div class="lp-plan" style="background:#8b74d6;color:#fff;--rot:-1.5deg"><span class="lp-pill">Centro</span><div class="lp-price lp-display">$14.990<small>/prof./mes</small></div><ul><li>Pacientes ilimitados</li><li>Panel del equipo</li><li>Reportes anónimos</li><li>Taller presencial trimestral</li></ul><button class="lp-btn" onclick="go('registro')">Quiero una demo</button></div>
+      <div class="lp-plan" style="background:#8b74d6;color:#fff;--rot:-1.5deg"><span class="lp-pill">Centro</span><div class="lp-price lp-display">$14.990<small>/prof./mes</small></div><ul><li>Pacientes ilimitados</li><li>Panel del equipo</li><li>Reportes anónimos</li><li>Taller presencial trimestral</li></ul><button class="lp-btn" onclick="lpScroll('#lp-centros')">Quiero una demo</button></div>
     </div>
   </section>
+
+  ${lpCentros()}
 
   <section class="lp-final">
     <div class="lp-final-st">${sticker("libro", 150)}</div>
@@ -1436,8 +1552,8 @@ function copyInv() { const v = $("#inv-msg").value; try { navigator.clipboard.wr
 function vApp() {
   const me = ME(), a = S.app, c = a.consent;
   if (!a.onboarded) return `<div class="card pac-onb">${appOnboarding()}</div>`;
-  const tabs = [["hoy","Hoy"],["rutas","Rutas"],["diario","Diario"],["comunidad","Comunidad"]];
-  const inner = a.open ? appActividad(lib(a.open)) : a.tab === "hoy" ? appHoy() : a.tab === "rutas" ? appRutas() : a.tab === "diario" ? appDiario() : appComunidad();
+  const tabs = [["hoy","Hoy"],["jardin","Jardín"],["album","Álbum"],["rutas","Rutas"],["diario","Diario"],["comunidad","Comunidad"]];
+  const inner = a.open ? appActividad(lib(a.open)) : a.tab === "hoy" ? appHoy() : a.tab === "jardin" ? appJardin() : a.tab === "album" ? appAlbum() : a.tab === "rutas" ? appRutas() : a.tab === "diario" ? appDiario() : appComunidad();
   const tabBtn = ([k, l]) => `<button class="${a.tab === k && !a.open ? "on" : ""}" onclick="pacTab('${k}')">${ICONS[k]}<span>${l}</span></button>`;
   const share = `<b style="font-size:13px">Lo que compartes</b>
     <ul class="tiny" style="padding-left:18px;margin:6px 0 8px;line-height:1.6">
@@ -1510,6 +1626,261 @@ const ICONS = {
   diario:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M6 3h11a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H6z"/><path d="M6 3v18M10 8h5M10 12h5"/></svg>`,
   comunidad:`<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.4"/><path d="M3 19c.8-3 3.2-4.5 6-4.5s5.2 1.5 6 4.5M15 15.2c2.6-.4 4.6.9 5.5 3.3"/></svg>`
 };
+/* ---------- Mi jardín ---------- */
+ICONS.jardin = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M12 21v-8"/><path d="M12 15c-3 0-5-2-5-4 3 0 5 2 5 4zM12 17c3 0 5-2 5-4-3 0-5 2-5 4z"/><circle cx="12" cy="7" r="2.2"/><path d="M12 4.8V3M14.2 7H16M9.8 7H8M13.6 5.4l1.2-1.2M10.4 5.4 9.2 4.2"/><path d="M4 21h16"/></svg>`;
+ICONS.album = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="9" cy="10" r="1.8"/><path d="m21 16-5-5-8 9"/></svg>`;
+const GMILES = [[1, "Primera flor", "Tu jardín empezó"], [7, "Llegó una mariposa", "7 flores plantadas"], [14, "Jardín en crecimiento", "14 flores plantadas"], [30, "Un mes cuidándote", "30 flores plantadas"], [60, "Jardín frondoso", "60 flores plantadas"], [100, "Jardín de cien flores", "100 flores plantadas"]];
+const MES_UP = ["Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre"];
+const dnDate = n => new Date(n * 864e5);
+const dnLabel = n => { const d = dnDate(n); return `${["domingo","lunes","martes","miércoles","jueves","viernes","sábado"][d.getUTCDay()]} ${d.getUTCDate()} de ${MESES_L[d.getUTCMonth()]}`; };
+function gardenSync() {
+  const a = S.app, me = ME(); if (!a.garden) a.garden = {};
+  if (me) me.mood.forEach((v, i) => { const k = TODAYN - 13 + i; if (v != null && !a.garden[k]) a.garden[k] = {m: v}; });
+  if (a.checkedToday && a.mood && !a.garden[TODAYN]) a.garden[TODAYN] = {m: a.mood, e: a.emos || []};
+  return a.garden;
+}
+const GPAL = [["#c9b8e6","#b4a0e2","#9f88dc","#8b74d6","#7a60cf"],["#f6c6d3","#f3a9bd","#ee8ca7","#e86f91","#e04f73"],["#f9cdb9","#f7b394","#f5986f","#f37f4f","#f2683c"],["#a9c8ef","#8fb6e8","#75a3e0","#5b90d8","#457ccc"],["#fbe39a","#f9d873","#f7cc4c","#f4bf2c","#eeb10c"]];
+function gFlower(m, d, size) {
+  const cols = GPAL[Math.floor(hash(d + 11) * GPAL.length)], c = cols[m - 1], sc = .45 + m * .11, droop = m === 1 ? 18 : 0;
+  let p = ""; for (let i = 0; i < 5; i++) p += `<ellipse cx="0" cy="-11" rx="7.5" ry="10" fill="${c}" opacity=".95" transform="rotate(${i * 72 + droop}) scale(${sc})"/>`;
+  const core = cols === GPAL[4] ? "#e04f73" : "#f8d34a";
+  const inner = `${p}<circle r="${4 * sc + 1.5}" fill="${core}"/><circle r="${1.6 * sc + .6}" fill="#fffdf8" opacity=".85"/>`;
+  return size ? `<svg width="${size}" height="${size}" viewBox="-24 -24 48 48" aria-hidden="true">${inner}</svg>` : inner;
+}
+function gStreak(g) { let n = 0, d = g[TODAYN] ? TODAYN : TODAYN - 1; while (g[d]) { n++; d--; } return n; }
+const hash = n => { let x = Math.sin(n * 12.9898) * 43758.5453; return x - Math.floor(x); };
+function gMonthInfo(off) {
+  const t = dnDate(TODAYN), y = t.getUTCFullYear(), m = t.getUTCMonth() + off;
+  const first = Math.round(Date.UTC(y, m, 1) / 864e5), next = Math.round(Date.UTC(y, m + 1, 1) / 864e5);
+  const fd = dnDate(first);
+  return {first, dim: next - first, label: `${MES_UP[fd.getUTCMonth()]} ${fd.getUTCFullYear()}`, wd: (fd.getUTCDay() + 6) % 7};
+}
+function gardenScene(g, mi, total, sel, anim) {
+  const days = [...Array(mi.dim)].map((_, i) => mi.first + i);
+  const vals = days.map(d => g[d] && g[d].m).filter(Boolean);
+  const avg = vals.length ? vals.reduce((s, v) => s + v, 0) / vals.length : 0;
+  const skyTop = avg >= 4 ? "#ffd9a8" : avg >= 3 ? "#f9d4e0" : avg >= 2 ? "#e3dcf3" : avg ? "#dfe2ea" : "#efe7f4";
+  const perRow = Math.ceil(mi.dim / 3), rows = [{y: 222, s: .66}, {y: 268, s: .82}, {y: 322, s: 1}];
+  const spots = days.map((d, i) => {
+    const r = Math.floor(i / perRow), j = i % perRow, R = rows[r];
+    const span = 900 - (2 - r) * 60, x0 = 50 + (2 - r) * 30 + (r === 1 ? span / perRow / 2 : 0);
+    const x = Math.min(950, x0 + j * (span / perRow) + (hash(d) - .5) * 18), y = R.y + (hash(d + 7) - .5) * 10;
+    return {d, x, y, s: R.s, e: g[d]};
+  });
+  const plant = p => {
+    if (p.e) {
+      const m = p.e.m, h = (34 + m * 11) * p.s, fs = (34 + m * 7) * p.s, top = p.y - h, bend = (hash(p.d + 3) - .5) * 14 * p.s;
+      const on = sel === p.d;
+      return `<g class="gf${on ? " on" : ""}" style="--d:${(p.d % 9) * 0.07}s" onclick="S.app.gSel=${p.d};render()" role="button" aria-label="${dnLabel(p.d)}: ${MOODS[m]}">
+        <path d="M${p.x} ${p.y} Q${p.x + bend} ${p.y - h / 2} ${p.x} ${top}" stroke="#5e9c6b" stroke-width="${3 * p.s}" fill="none" stroke-linecap="round"/>
+        <ellipse cx="${p.x + 7 * p.s}" cy="${p.y - h * .38}" rx="${8 * p.s}" ry="${3.6 * p.s}" fill="#79b77f" transform="rotate(-28 ${p.x + 7 * p.s} ${p.y - h * .38})"/>
+        ${on ? `<circle cx="${p.x}" cy="${top}" r="${fs * .62}" fill="#fff" opacity=".75"/>` : ""}
+        <svg x="${p.x - fs / 2}" y="${top - fs / 2}" width="${fs}" height="${fs}" viewBox="-24 -24 48 48" overflow="visible">${gFlower(m, p.d)}</svg>
+        <rect x="${p.x - fs / 2}" y="${top - fs / 2}" width="${fs}" height="${h + fs / 2}" fill="transparent"/></g>`;
+    }
+    if (p.d === TODAYN) return `<g class="gtoday" onclick="pacTab('hoy')" role="button" aria-label="Registrar la flor de hoy"><circle cx="${p.x}" cy="${p.y - 14}" r="${15 * p.s}" fill="#fffaf4" stroke="#e04f73" stroke-width="2" stroke-dasharray="4 3"/><text x="${p.x}" y="${p.y - 14 + 6 * p.s}" text-anchor="middle" font-size="${18 * p.s}" font-weight="800" fill="#e04f73">+</text></g>`;
+    if (p.d < TODAYN) return `<g opacity=".8"><ellipse cx="${p.x}" cy="${p.y}" rx="${9 * p.s}" ry="${3 * p.s}" fill="#a07a5a" opacity=".35"/><path d="M${p.x} ${p.y} v${-7 * p.s}" stroke="#79b77f" stroke-width="${2 * p.s}"/><ellipse cx="${p.x - 3 * p.s}" cy="${p.y - 7 * p.s}" rx="${3.2 * p.s}" ry="${1.6 * p.s}" fill="#9ccc9a"/><ellipse cx="${p.x + 3 * p.s}" cy="${p.y - 8 * p.s}" rx="${3.2 * p.s}" ry="${1.6 * p.s}" fill="#9ccc9a"/></g>`;
+    return `<ellipse cx="${p.x}" cy="${p.y}" rx="${8 * p.s}" ry="${2.6 * p.s}" fill="#a07a5a" opacity=".25"/>`;
+  };
+  const bf = (document.querySelector('link[rel="icon"]') || {}).href || "";
+  const nb = Math.min(4, Math.floor(total / 7));
+  const flies = [...Array(nb)].map((_, i) => `<image href="${bf}" class="gbf" style="animation-delay:${-i * 2.3}s" x="${[160, 640, 380, 820][i]}" y="${[70, 95, 130, 150][i]}" width="${[42, 36, 30, 34][i]}" height="${[42, 36, 30, 34][i]}"/>`).join("");
+  const todayDone = !!g[TODAYN];
+  return `<svg class="gscene${anim ? " anim" : ""}" viewBox="0 0 1000 360" preserveAspectRatio="xMidYMid slice" role="img" aria-label="Tu jardín de ${mi.label}">
+    <defs><linearGradient id="gsky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${skyTop}"/><stop offset="1" stop-color="#fff7ec"/></linearGradient></defs>
+    <rect width="1000" height="360" fill="url(#gsky)"/>
+    <g class="gsun${todayDone ? " on" : ""}"><circle cx="880" cy="70" r="${todayDone ? 40 : 30}" fill="#f8d34a" opacity="${todayDone ? 1 : .55}"/>${todayDone ? [...Array(10)].map((_, i) => `<path d="M880 14 v-12" stroke="#f8d34a" stroke-width="4" stroke-linecap="round" transform="rotate(${i * 36} 880 70)"/>`).join("") : ""}</g>
+    <g class="gcloud"><ellipse cx="180" cy="62" rx="54" ry="16" fill="#fff" opacity=".85"/><ellipse cx="210" cy="52" rx="30" ry="16" fill="#fff" opacity=".85"/></g>
+    <g class="gcloud c2"><ellipse cx="560" cy="44" rx="44" ry="13" fill="#fff" opacity=".7"/><ellipse cx="585" cy="36" rx="24" ry="13" fill="#fff" opacity=".7"/></g>
+    <path d="M0 210 Q180 160 360 196 T720 186 T1000 176 V360 H0Z" fill="#cfe6c2"/>
+    <path d="M0 238 Q250 206 520 232 T1000 222 V360 H0Z" fill="#b6dba5"/>
+    <path d="M0 300 Q300 282 600 298 T1000 292 V360 H0Z" fill="#a3d091"/>
+    ${spots.map(plant).join("")}${flies}
+  </svg>`;
+}
+function appJardin() {
+  const a = S.app, g = gardenSync(), off = a.gMonth || 0, mi = gMonthInfo(off);
+  const all = Object.keys(g).map(Number), total = all.length, streak = gStreak(g);
+  const days = [...Array(mi.dim)].map((_, i) => mi.first + i), mine = days.filter(d => g[d]);
+  const cnt = [0, 0, 0, 0, 0, 0]; mine.forEach(d => cnt[g[d].m]++);
+  const top = cnt.indexOf(Math.max(...cnt));
+  const emo = {}; mine.forEach(d => (g[d].e || []).forEach(e => emo[e] = (emo[e] || 0) + 1));
+  const topEmo = Object.entries(emo).sort((x, y) => y[1] - x[1]).slice(0, 3);
+  const sel = a.gSel && g[a.gSel] ? a.gSel : null, se = sel && g[sel];
+  const next = GMILES.find(([n]) => n > total);
+  const cal = `<div class="gcal">${["L","M","M","J","V","S","D"].map(x => `<b>${x}</b>`).join("")}${"<i></i>".repeat(mi.wd)}${days.map(d => {
+    const e = g[d], fut = d > TODAYN;
+    return `<button class="${e ? "has" : ""}${d === TODAYN ? " today" : ""}${sel === d ? " on" : ""}" ${e ? `onclick="S.app.gSel=${d};render()"` : d === TODAYN ? `onclick="pacTab('hoy')"` : "disabled"} aria-label="${dnLabel(d)}${e ? ": " + MOODS[e.m] : ""}"><span>${dnDate(d).getUTCDate()}</span>${e ? gFlower(e.m, d, 26) : fut ? "" : `<em></em>`}</button>`;
+  }).join("")}</div>`;
+  return `<div class="ghead"><div><div class="a-h">Mi jardín</div><div class="tiny muted">Cada día que registras tu flor, se planta en tu jardín. Es solo tuyo.</div></div>
+      <div class="gnav"><button onclick="S.app.gMonth=${off - 1};S.app.gSel=null;render()" aria-label="Mes anterior">‹</button><b>${mi.label}</b><button onclick="S.app.gMonth=${off + 1};S.app.gSel=null;render()" ${off >= 0 ? "disabled" : ""} aria-label="Mes siguiente">›</button></div></div>
+    <div class="gwrap">${gardenScene(g, mi, total, sel, a.gAnimDone !== off && (a.gAnimDone = off, true))}
+      ${!mine.length ? `<div class="gempty"><b>${off < 0 ? "Este mes tu jardín descansó" : "Tu jardín te está esperando"}</b><span>${off < 0 ? "Los días sin flor también son parte del camino." : "Registra cómo está tu flor hoy y plantarás la primera."}</span>${off === 0 && !g[TODAYN] ? `<button class="lp-btn sm" onclick="pacTab('hoy')">Plantar mi flor de hoy</button>` : ""}</div>` : ""}
+    </div>
+    ${se ? `<div class="a-card gdet">${gFlower(se.m, sel, 64)}<div style="flex:1;min-width:0"><div class="tiny muted gcap">${dnLabel(sel)}</div><b style="font-size:18px">Tu flor estaba ${MOODS[se.m].toLowerCase()}</b>
+      ${(se.e || []).length ? `<div class="emos" style="margin:8px 0 0">${se.e.map(e => `<span class="gchip">${esc(e)}</span>`).join("")}</div>` : ""}
+      ${se.n ? `<p class="gnote">“${esc(se.n)}”</p>` : ""}</div><button class="nomi-x" style="background:var(--cream)" onclick="S.app.gSel=null;render()" aria-label="Cerrar">✕</button></div>` : mine.length ? `<div class="tiny muted" style="margin:10px 2px 0">Toca una flor para recordar ese día.</div>` : ""}
+    <div class="gstats">
+      <div class="gst"><span class="lp-display">${mine.length}</span>flores este mes</div>
+      <div class="gst"><span class="lp-display">${streak}</span>día${streak === 1 ? "" : "s"} seguidos</div>
+      <div class="gst">${mine.length ? flower(top, 40) : `<span class="lp-display">–</span>`}${mine.length ? `mayormente ${MOODS[top].toLowerCase()}` : "sin flores aún"}</div>
+      <div class="gst"><span class="lp-display">${total}</span>flores en total</div>
+    </div>
+    ${topEmo.length ? `<div class="a-card"><b style="font-size:14px">Lo que más hubo en tu jardín este mes</b><div class="emos" style="margin-bottom:0">${topEmo.map(([e, n]) => `<span class="gchip">${esc(e)} · ${n}</span>`).join("")}</div></div>` : ""}
+    <div class="a-card"><b style="font-size:14px">Calendario de ${mi.label.toLowerCase()}</b>${cal}</div>
+    <div class="a-card"><b style="font-size:14px">Momentos de tu jardín</b>
+      ${next ? `<div class="tiny muted" style="margin-top:4px">Te ${next[0] - total === 1 ? "falta 1 flor" : `faltan ${next[0] - total} flores`} para: <b>${next[1]}</b></div><div class="prog"><i style="width:${Math.min(100, total / next[0] * 100)}%"></i></div>` : ""}
+      <div class="gmiles">${GMILES.map(([n, t, d]) => `<div class="${total >= n ? "ok" : ""}"><span>${total >= n ? "✓" : n}</span><b>${t}</b><small>${d}</small></div>`).join("")}</div>
+      <p class="tiny muted" style="margin:10px 0 0">Si un día no registras, no pasa nada: tu jardín te espera sin apuro.</p></div>
+    <div style="height:40px"></div>`;
+}
+
+/* ---------- Mi álbum ---------- */
+const ALB_F = [["todo", "Todo"], ["Escritura", "Escritura"], ["Arte", "Arte"], ["Lectura", "Lectura"], ["Música", "Música"], ["Cuerpo", "Cuerpo"], ["libre", "Libres"], ["sesion", "★ Para mi sesión"]];
+const albList = () => { const a = S.app, f = a.albF || "todo"; return (a.album || []).filter(it => f === "todo" || (f === "sesion" ? it.session : f === "libre" ? it.kind === "libre" : it.type === f)); };
+function albCard(it, i) {
+  const T = TYPES[it.type] || {c: "#e04f73", bg: "#fde6ea", i: "✿"};
+  return `<button class="alb-card" onclick="S.app.albOpen='${it.id}';render()">
+    ${it.img ? `<img src="${it.img}" alt="" loading="lazy">` : `<div class="alb-txt" style="background:${T.bg};color:${T.c}"><span>${T.i}</span><p>${esc((it.text || it.title || "").slice(0, 160))}${(it.text || "").length > 160 ? "…" : ""}</p></div>`}
+    <div class="alb-meta"><b>${esc(it.title || "Sin título")}</b><small>${fmtDayAbs(it.day)} · ${it.kind === "libre" ? "Libre" : esc(it.type || "")}</small></div>
+    ${it.session ? `<span class="alb-star" title="Para mi próxima sesión">★</span>` : ""}</button>`;
+}
+const fmtDayAbs = n => { const d = dnDate(n); return n === TODAYN ? "Hoy" : `${d.getUTCDate()} ${MESES[d.getUTCMonth()]}`; };
+function appAlbum() {
+  const a = S.app, items = a.album || [], list = albList(), ses = items.filter(x => x.session).length;
+  return `<div class="ghead"><div><div class="a-h">Mi álbum</div><div class="tiny muted">Todo lo que has creado, en un solo lugar. Es privado: tú decides qué mostrar.</div></div>
+      <div class="row" style="gap:8px;flex-wrap:wrap"><button class="lp-btn sm" onclick="albNew()">＋ Agregar</button>${ses ? `<button class="btn ghost sm" onclick="S.app.slide=0;render()">▶ Modo sesión (${ses})</button>` : ""}</div></div>
+    ${items.length ? `<div class="alb-f">${ALB_F.map(([k, l]) => `<button class="${(a.albF || "todo") === k ? "on" : ""}" onclick="S.app.albF='${k}';render()">${l}</button>`).join("")}</div>` : ""}
+    ${!items.length ? `<div class="a-card alb-empty">${sticker("paleta", 110)}<b>Tu álbum está vacío… por ahora</b><p class="tiny muted">Cuando termines una actividad, lo que escribas o la foto de lo que hagas quedará guardado aquí. También puedes agregar cualquier cosa que hayas creado.</p><div class="row" style="justify-content:center;gap:8px;flex-wrap:wrap"><button class="lp-btn sm" onclick="albNew()">Agregar mi primera creación</button><button class="btn ghost sm" onclick="pacTab('rutas')">Ver actividades</button></div></div>`
+      : list.length ? `<div class="alb-grid">${list.map(albCard).join("")}</div>` : `<p class="muted tiny" style="margin-top:14px">No hay creaciones con ese filtro.</p>`}
+    ${items.length ? `<div class="a-card tiny muted" style="display:flex;gap:10px;align-items:center"><span style="font-size:20px;color:#e04f73">★</span><span>Marca con estrella lo que quieras mostrar en tu próxima sesión y ábrelo con <b>Modo sesión</b> para verlo en pantalla completa junto a tu psicólogo/a.</span></div>` : ""}
+    <div style="height:40px"></div>${a.albOpen ? albViewer() : ""}${a.albDraft ? albForm() : ""}${a.slide != null ? albSlides() : ""}`;
+}
+function albViewer() {
+  const a = S.app, list = albList(), i = list.findIndex(x => x.id === a.albOpen), it = list[i] || (a.album || []).find(x => x.id === a.albOpen);
+  if (!it) { a.albOpen = null; return ""; }
+  const T = TYPES[it.type] || {c: "#e04f73", bg: "#fde6ea", i: "✿"};
+  const nav = d => list[i + d] ? `onclick="S.app.albOpen='${list[i + d].id}';S.app.albDel=false;render()"` : "disabled";
+  return `<div class="alb-ov" onclick="if(event.target===this){S.app.albOpen=null;S.app.albDel=false;render()}"><div class="alb-box">
+    <button class="nomi-x alb-close" onclick="S.app.albOpen=null;S.app.albDel=false;render()" aria-label="Cerrar">✕</button>
+    ${it.img ? `<img class="alb-big" src="${it.img}" alt="${esc(it.title || "")}">` : ""}
+    <div class="alb-body"><span class="typ" style="color:${T.c}">${T.i} ${it.kind === "libre" ? "Creación libre" : esc(it.type || "")} · ${fmtDayAbs(it.day)}</span>
+      <div class="a-h" style="font-size:24px">${esc(it.title || "Sin título")}</div>
+      ${it.text ? `<p class="alb-full">${esc(it.text).replace(/\n/g, "<br>")}</p>` : ""}
+      <div class="tog" style="border:0"><div><b style="font-size:14px">Para mi próxima sesión</b><div class="tiny muted">Aparecerá en el Modo sesión</div></div><button class="sw ${it.session ? "on" : ""}" aria-pressed="${!!it.session}" aria-label="Para mi próxima sesión" onclick="albToggle('${it.id}')"></button></div>
+      <div class="row" style="justify-content:space-between;gap:8px;flex-wrap:wrap;margin-top:6px">
+        <div class="row" style="gap:6px"><button class="btn ghost sm" ${nav(-1)}>← Anterior</button><button class="btn ghost sm" ${nav(1)}>Siguiente →</button></div>
+        ${a.albDel ? `<div class="row" style="gap:6px"><span class="tiny">¿Eliminar para siempre?</span><button class="btn sm" style="background:var(--danger)" onclick="albRemove('${it.id}')">Sí, eliminar</button><button class="btn ghost sm" onclick="S.app.albDel=false;render()">No</button></div>` : `<button class="btn ghost sm" onclick="S.app.albDel=true;render()">Eliminar</button>`}
+      </div></div></div></div>`;
+}
+function albNew() { S.app.albDraft = {title: "", text: "", img: null, type: "libre"}; render(); }
+function albForm() {
+  const d = S.app.albDraft;
+  return `<div class="alb-ov" onclick="if(event.target===this){S.app.albDraft=null;render()}"><div class="alb-box" style="max-width:520px"><div class="alb-body">
+    <button class="nomi-x alb-close" onclick="S.app.albDraft=null;render()" aria-label="Cerrar">✕</button>
+    <div class="a-h" style="font-size:24px">Agregar al álbum</div><p class="tiny muted" style="margin:2px 0 10px">Un dibujo, un collage, un texto, una foto de algo que te hizo bien. Queda privado.</p>
+    <label class="upl">${d.img ? `<img src="${d.img}" alt="Vista previa">` : "＋ Subir una foto (opcional)"}<input type="file" accept="image/*" class="hidden" onchange="pickImg(this,'alb')"></label>
+    <input class="a-in" style="margin-top:10px" maxlength="80" placeholder="Título (opcional)" value="${esc(d.title)}" oninput="S.app.albDraft.title=this.value">
+    <textarea class="a-in" rows="4" style="margin-top:8px" maxlength="3000" placeholder="¿Qué quieres recordar de esto?" oninput="S.app.albDraft.text=this.value">${esc(d.text)}</textarea>
+    <div class="alb-f" style="margin-top:8px">${[["libre", "Libre"], ...Object.keys(TYPES).map(k => [k, k])].map(([k, l]) => `<button class="${d.type === k ? "on" : ""}" onclick="S.app.albDraft.type='${k}';render()">${l}</button>`).join("")}</div>
+    <button class="a-btn" onclick="albSaveDraft()">Guardar en mi álbum</button></div></div></div>`;
+}
+function albSaveDraft() {
+  const d = S.app.albDraft; if (!d.img && !d.text.trim() && !d.title.trim()) { toast("Agrega una foto o escribe algo primero."); return; }
+  albPut({id: "alb_" + Date.now().toString(36), kind: d.type === "libre" ? "libre" : "act", type: d.type === "libre" ? "" : d.type, title: d.title.trim() || (d.type === "libre" ? "Creación libre" : d.type), text: d.text.trim(), img: d.img, day: TODAYN, session: false, ts: Date.now()});
+  S.app.albDraft = null; render(); toast("Guardado en tu álbum.");
+}
+function albSlides() {
+  const a = S.app, list = (a.album || []).filter(x => x.session);
+  if (!list.length) { a.slide = null; return ""; }
+  const i = Math.max(0, Math.min(a.slide, list.length - 1)), it = list[i];
+  return `<div class="alb-show"><div class="alb-show-top"><b>Lo que quiero mostrarte hoy</b><span>${i + 1} de ${list.length}</span><button class="btn ghost sm" onclick="S.app.slide=null;render()">Salir</button></div>
+    <div class="alb-show-main">${it.img ? `<img src="${it.img}" alt="">` : ""}<div class="alb-show-txt"><div class="tiny muted">${fmtDayAbs(it.day)}${it.type ? " · " + esc(it.type) : ""}</div><div class="lp-display" style="font-size:clamp(26px,4vw,40px)">${esc(it.title || "")}</div>${it.text ? `<p>${esc(it.text).replace(/\n/g, "<br>")}</p>` : ""}</div></div>
+    <div class="alb-show-nav"><button class="lp-btn sm" ${i ? `onclick="S.app.slide=${i - 1};render()"` : "disabled"}>← Anterior</button><div class="alb-dots">${list.map((_, k) => `<i class="${k === i ? "on" : ""}"></i>`).join("")}</div><button class="lp-btn sm" ${i < list.length - 1 ? `onclick="S.app.slide=${i + 1};render()"` : "disabled"}>Siguiente →</button></div></div>`;
+}
+function albPut(it) {
+  const a = S.app; a.album = a.album || [];
+  const k = a.album.findIndex(x => x.id === it.id);
+  if (k >= 0) a.album[k] = it; else a.album.unshift(it);
+  if (db && S.uid && S.user && S.user.role === "pac") { const {id, ...data} = it; F.setDoc(F.doc(db, "users", S.uid, "private", id), data).catch(e => { console.error(e); toast("No se pudo guardar en tu álbum. Revisa tu conexión."); }); }
+}
+function albToggle(id) { const it = (S.app.album || []).find(x => x.id === id); if (!it) return; albPut({...it, session: !it.session}); render(); }
+function albRemove(id) {
+  const a = S.app; a.album = (a.album || []).filter(x => x.id !== id); a.albOpen = null; a.albDel = false;
+  if (db && S.uid && S.user) F.deleteDoc(F.doc(db, "users", S.uid, "private", id)).catch(e => console.error(e));
+  render(); toast("Eliminado de tu álbum.");
+}
+async function albumLoad() {
+  if (!db || !S.uid) return;
+  try {
+    const qs = await F.getDocs(F.collection(db, "users", S.uid, "private"));
+    const items = []; qs.forEach(d => { if (d.id.startsWith("alb_")) items.push({id: d.id, ...d.data()}); });
+    items.sort((x, y) => (y.day - x.day) || ((y.ts || 0) - (x.ts || 0)));
+    S.app.album = items; albumImport(); liveRender();
+  } catch (e) { console.error(e); }
+}
+function albumImport() {
+  const a = S.app, me = ME(); if (a.albumImported || !me) return;
+  (me.done || []).filter(d => d.text || d.img).forEach((d, k) => { const x = lib(d.a) || {}; albPut({id: "alb_imp" + k + "_" + Date.now().toString(36), kind: d.diario ? "libre" : "act", a: d.a, type: d.diario ? "" : x.type || "", title: d.diario ? "Entrada de diario" : x.t || "Actividad", text: d.text || "", img: d.img || null, day: TODAYN - d.date, session: false, ts: Date.now() - k}); });
+  a.albumImported = true; save();
+}
+
+/* ---------- Centros (enterprise) ---------- */
+const LEAD = {sent: false, busy: false, name: ""};
+function lpScroll(sel) { if (S.view !== "presentacion") go("presentacion"); setTimeout(() => { const el = document.querySelector(sel); if (el) el.scrollIntoView({behavior: "smooth", block: "start"}); }, 60); }
+function lpCentros() {
+  const opt = arr => arr.map(x => `<option>${x}</option>`).join("");
+  return `<section class="lp-ent" id="lp-centros">
+    <div class="lp-ent-info">
+      <span class="lp-pill">para clínicas y centros de salud</span>
+      <h2 class="lp-display">¿Tienes un centro médico?</h2>
+      <p>Llevamos No Me Olvides a todo tu equipo, con un plan a la medida del tamaño de tu centro.</p>
+      <ul class="lp-ent-list">
+        <li><b>Panel del equipo</b> para coordinar a todos tus profesionales y sus pacientes.</li>
+        <li><b>Reportes anónimos</b> de uso y bienestar para mostrar el impacto del programa.</li>
+        <li><b>Implementación acompañada</b>, capacitación y un taller presencial para el equipo.</li>
+        <li><b>Precio por volumen</b> y facturación para empresas e instituciones.</li>
+        <li><b>Material listo</b> para presentar el programa a tus pacientes.</li>
+      </ul>
+      <div class="lp-ent-st">${sticker("flor", 110)}</div>
+    </div>
+    <div class="lp-ent-form">${LEAD.sent ? `<div class="lp-ent-ok">${sticker("nota", 100)}<h3 class="lp-display">¡Gracias${LEAD.name ? ", " + esc(LEAD.name) : ""}!</h3><p>Recibimos tu solicitud. Te escribiremos dentro de los próximos días hábiles para coordinar una demo.</p></div>` : `
+      <form onsubmit="event.preventDefault();sendLead(this)" novalidate>
+        <h3>Solicita una demo para tu centro</h3>
+        <div class="lp-ent-grid">
+          <label>Nombre y apellido*<input name="nombre" maxlength="80" required autocomplete="name"></label>
+          <label>Cargo<input name="cargo" maxlength="80" placeholder="Ej: directora clínica" autocomplete="organization-title"></label>
+          <label class="full">Nombre del centro*<input name="centro" maxlength="120" required autocomplete="organization"></label>
+          <label>Tipo de centro*<select name="tipo" required><option value="">Selecciona</option>${opt(["Clínica", "Centro médico", "Centro de salud mental", "CESFAM / atención primaria", "Hospital", "Universidad o colegio", "Empresa (bienestar laboral)", "Otro"])}</select></label>
+          <label>N.º de profesionales*<select name="equipo" required><option value="">Selecciona</option>${opt(["1 a 5", "6 a 20", "21 a 50", "Más de 50"])}</select></label>
+          <label>Región<select name="region"><option value="">Selecciona</option>${opt(REGIONES.map(r => r.n || r.name || r[0] || r))}</select></label>
+          <label>Ciudad o comuna<input name="ciudad" maxlength="80"></label>
+          <label>Correo*<input name="email" type="email" maxlength="120" required autocomplete="email"></label>
+          <label>Teléfono<input name="telefono" type="tel" maxlength="30" autocomplete="tel"></label>
+          <label class="full">¿Qué te gustaría lograr?<textarea name="mensaje" rows="3" maxlength="1000" placeholder="Cuéntanos sobre tu centro y tus pacientes"></textarea></label>
+          <input name="web" class="hidden" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <label class="full lp-ent-ck"><input type="checkbox" name="ok" required> Acepto que el equipo de No Me Olvides me contacte por esta solicitud.</label>
+        </div>
+        <div class="lp-ent-err" id="lead-err"></div>
+        <button class="lp-btn" ${LEAD.busy ? "disabled" : ""}>${LEAD.busy ? "Enviando…" : "Quiero una demo"}</button>
+      </form>`}</div>
+  </section>`;
+}
+async function sendLead(f) {
+  const v = Object.fromEntries(new FormData(f).entries()), err = m => { const e = $("#lead-err"); if (e) e.textContent = m; };
+  if (v.web) { LEAD.sent = true; render(); return; }
+  if (!v.nombre.trim() || !v.centro.trim() || !v.tipo || !v.equipo) return err("Completa los campos marcados con *.");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email.trim())) return err("Revisa tu correo.");
+  if (!v.ok) return err("Necesitamos tu autorización para contactarte.");
+  if (!db) return err("No pudimos conectarnos. Inténtalo de nuevo en un momento.");
+  LEAD.busy = true; err("");
+  const btn = f.querySelector("button"); if (btn) { btn.disabled = true; btn.textContent = "Enviando…"; }
+  const data = {nombre: v.nombre.trim(), cargo: (v.cargo || "").trim(), centro: v.centro.trim(), tipo: v.tipo, equipo: v.equipo, region: v.region || "", ciudad: (v.ciudad || "").trim(), email: v.email.trim(), telefono: (v.telefono || "").trim(), mensaje: (v.mensaje || "").trim(), creado: new Date().toISOString(), origen: "landing"};
+  try { await F.addDoc(F.collection(db, "leads"), data); LEAD.sent = true; LEAD.name = firstName(data.nombre); render(); lpScroll("#lp-centros"); }
+  catch (e) { console.error(e); err("No pudimos enviar tu solicitud. Inténtalo de nuevo en un momento."); if (btn) { btn.disabled = false; btn.textContent = "Quiero una demo"; } }
+  LEAD.busy = false;
+}
+
 function appMain() {
   const a = S.app;
   let inner = "";
@@ -1528,7 +1899,7 @@ function appHoy() {
   const pend = me.assigned.filter(as => !me.done.some(d => d.a === as.a && d.date <= as.date));
   const doneAssigned = me.assigned.filter(as => me.done.some(d => d.a === as.a && d.date <= as.date));
   const streak = (() => { let n = 0; for (let i = 13; i >= 0; i--) { if (me.mood[i] != null) n++; else if (i === 13) continue; else break; } return n; })();
-  const checkin = a.checkedToday ? `<div class="a-card" style="display:flex;gap:12px;align-items:center">${flower(a.mood, 54)}<div><b>Hoy tu flor está ${MOODS[a.mood].toLowerCase()}</b><div class="tiny muted">${a.emos.length ? a.emos.join(", ") : "Registrado"} · ${streak} día${streak === 1 ? "" : "s"} registrando</div></div></div>` :
+  const checkin = a.checkedToday ? `<div class="a-card" style="display:flex;gap:12px;align-items:center">${flower(a.mood, 54)}<div><b>Hoy tu flor está ${MOODS[a.mood].toLowerCase()}</b><div class="tiny muted">${a.emos.length ? a.emos.join(", ") : "Registrado"} · ${streak} día${streak === 1 ? "" : "s"} registrando</div><button class="back" style="padding:4px 0 0" onclick="pacTab('jardin')">Ver mi jardín →</button></div></div>` :
     `<div class="a-card"><b>¿Cómo está tu flor hoy?</b>
       <div class="moods">${[1,2,3,4,5].map(v => `<button class="${a.mood === v ? "on" : ""}" onclick="S.app.mood=${v};render()">${flower(v, 46)}${MOODS[v]}</button>`).join("")}</div>
       ${a.mood ? `<div class="tiny muted" style="margin-top:8px">¿Qué hay en ella? (opcional)</div>
@@ -1553,6 +1924,8 @@ function saveCheckin() {
   const me = ME(), a = S.app;
   if (a.consent.checkins) { me.mood[13] = a.mood; a.emos.forEach(e => me.emos[e] = (me.emos[e] || 0) + 1); }
   me.lastActive = 0; a.checkedToday = true;
+  if (!a.garden) a.garden = {};
+  a.garden[TODAYN] = {m: a.mood, e: (a.emos || []).slice(), n: (a.moodNote || "").trim().slice(0, 280)};
   render(); toast(a.consent.checkins ? "Guardado. Tu profesional verá cómo estuvo tu semana." : "Guardado solo para ti.");
 }
 function openAct(id) { S.app.open = id; S.app.actText = ""; S.app.actImg = null; S.app.actShared = true; render(); const s = $("#scr"); if (s) s.scrollTop = 0; window.scrollTo(0, 0); }
@@ -1570,19 +1943,24 @@ function appActividad(x) {
     </div>
     <button class="a-btn" onclick="finishAct('${x.id}')">Marcar como hecha</button><div style="height:60px"></div>`;
 }
-function pickImg(inp) {
+function pickImg(inp, target) {
   const f = inp.files && inp.files[0]; if (!f) return;
   const r = new FileReader();
-  r.onload = () => { const img = new Image(); img.onload = () => { const c = document.createElement("canvas"); const k = Math.min(1, 360 / img.width); c.width = img.width * k; c.height = img.height * k; c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); S.app.actImg = c.toDataURL("image/jpeg", .7); render(); }; img.src = r.result; };
+  const shrink = (img, max, q) => { const c = document.createElement("canvas"); const k = Math.min(1, max / Math.max(img.width, img.height)); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); return c.toDataURL("image/jpeg", q); };
+  r.onload = () => { const img = new Image(); img.onload = () => {
+    if (target === "alb") { if (S.app.albDraft) S.app.albDraft.img = shrink(img, 1000, .74); }
+    else { S.app.actImg = shrink(img, 1000, .74); S.app.actImgSm = shrink(img, 360, .7); }
+    render(); }; img.src = r.result; };
   r.readAsDataURL(f);
 }
 function finishAct(id) {
   const me = ME(), a = S.app;
   const shared = a.actShared && a.consent.actividades;
-  me.done.push({a: id, date: 0, text: shared ? a.actText.trim() : "", shared, img: shared ? a.actImg : null});
+  me.done.push({a: id, date: 0, text: shared ? a.actText.trim() : "", shared, img: shared ? (a.actImgSm || a.actImg) : null});
+  if (a.actText.trim() || a.actImg) albPut({id: "alb_" + Date.now().toString(36), kind: "act", a: id, type: lib(id).type, title: lib(id).t, text: a.actText.trim(), img: a.actImg, day: TODAYN, session: false, ts: Date.now()});
   if (!shared) a.journal.unshift({date: 0, text: `${lib(id).t}: ${a.actText.trim() || "completada"}`, shared: false});
-  me.lastActive = 0; a.open = null; a.actImg = null;
-  render(); toast(shared ? `¡Bien hecho! ${firstName(S.pro.name)} lo verá antes de tu próxima sesión.` : "¡Bien hecho! Quedó guardado en tu diario.");
+  me.lastActive = 0; a.open = null; a.actImg = null; a.actImgSm = null;
+  render(); toast((shared ? `¡Bien hecho! ${firstName(S.pro.name)} lo verá antes de tu próxima sesión.` : "¡Bien hecho! Quedó guardado en tu diario.") + (a.actText.trim() || S.app.album[0] && S.app.album[0].ts > Date.now() - 2000 ? " También está en tu álbum." : ""));
 }
 function appRutas() {
   const r = [
@@ -1591,7 +1969,7 @@ function appRutas() {
     {t:"Club de lectura: refugios", d:"Cuatro textos breves sobre volver a uno mismo.", n:0, of:4, type:"Lectura"},
   ];
   return `<div class="a-h">Rutas</div><div class="tiny muted">Caminos cortos, curados por expertos</div>
-    ${r.map(x => { const T = TYPES[x.type]; return `<div class="a-card"><span class="typ" style="color:${T.c}">${T.i} ${x.type}</span><div style="font-family:"Bagel Fat One",sans-serif;font-size:18px;font-weight:600">${x.t}</div><div class="tiny muted">${x.d}</div><div class="prog"><i style="width:${x.n / x.of * 100}%"></i></div><div class="tiny muted" style="margin-top:4px">${x.n} de ${x.of}</div></div>`; }).join("")}
+    ${r.map(x => { const T = TYPES[x.type]; return `<div class="a-card"><span class="typ" style="color:${T.c}">${T.i} ${x.type}</span><div style="font-family:'Bagel Fat One',sans-serif;font-size:18px;font-weight:600">${x.t}</div><div class="tiny muted">${x.d}</div><div class="prog"><i style="width:${x.n / x.of * 100}%"></i></div><div class="tiny muted" style="margin-top:4px">${x.n} de ${x.of}</div></div>`; }).join("")}
     <div style="margin-top:16px"><b>Toda la biblioteca</b></div>
     ${LIB.map(x => taskBtn({a: x.id})).join("")}<div style="height:50px"></div>`;
 }
@@ -1618,7 +1996,7 @@ function appComunidad() {
   ];
   const j = S.app.joined;
   return `<div class="a-h">Comunidad</div><div class="tiny muted">Espacios moderados por facilitadores</div>
-    <div class="a-card" style="background:var(--blue2);border-color:transparent"><span class="typ" style="color:#5a43a8">Reto de la semana</span><div style="font-family:"Bagel Fat One",sans-serif;font-size:18px;font-weight:600">Fotografía algo azul que te dé calma</div><div class="tiny muted">142 personas participando</div></div>
+    <div class="a-card" style="background:var(--blue2);border-color:transparent"><span class="typ" style="color:#5a43a8">Reto de la semana</span><div style="font-family:'Bagel Fat One',sans-serif;font-size:18px;font-weight:600">Fotografía algo azul que te dé calma</div><div class="tiny muted">142 personas participando</div></div>
     <div style="margin-top:16px"><b>Próximos encuentros</b></div>
     ${ev.map(e => `<div class="ev"><div class="d">${e.d}<small>${e.m}</small></div><div style="flex:1"><b style="font-size:14px">${e.t}</b><div class="tiny muted">${e.s}</div></div><button class="btn sm ${j.includes(e.id) ? "ghost" : ""}" onclick="joinEv('${e.id}')">${j.includes(e.id) ? "Inscrito/a" : "Unirme"}</button></div>`).join("")}
     <div class="a-card tiny muted">Las conversaciones de la comunidad no se comparten con tu profesional.</div><div style="height:50px"></div>`;
