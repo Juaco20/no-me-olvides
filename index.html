@@ -1142,7 +1142,7 @@ function nomiScroll(sel) { NOMI.open = false; nomiDraw(); if (S.view !== "presen
 function nomiSync() {
   let root = document.getElementById("nomi");
   if (!root) { root = document.createElement("div"); root.id = "nomi"; document.body.appendChild(root); nomiDraw(); }
-  root.style.display = NOMI.views.includes(S.view) && !S.user ? "" : "none";
+  root.style.display = NOMI.views.includes(S.view) ? "" : "none";
 }
 function nomiDraw() {
   const root = document.getElementById("nomi"); if (!root) return;
